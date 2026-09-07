@@ -10,6 +10,9 @@ venv/
 
 # Environment and secrets
 .env
+backend/.env
+backend/.env.example
+backend/.venv
 .env.*
 !.env.example
 *.pem
@@ -31,3 +34,6 @@ release/
 .idea/
 .DS_Store
 Thumbs.db
+PROGRESS.md
+PROJECTS.md
+SECURITY.md
