@@ -333,11 +333,15 @@ components:
 
     Run:
       type: object
-      required: [id, status, created_at]
+      required: [id, trigger, status, created_at]
       properties:
         id:
           type: string
           format: uuid
+        trigger:
+          type: string
+          enum: [manual, scheduled]
+          default: manual
         status:
           type: string
           enum: [queued, running, completed, failed]
