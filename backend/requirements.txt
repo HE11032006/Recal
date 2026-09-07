@@ -1,0 +1,4 @@
+boto3 
+strands-agents 
+tavily-python 
+python-dotenv
