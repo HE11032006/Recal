@@ -7,7 +7,7 @@ facilement testable et réutilisable par l'API comme par le worker planifié.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from enum import StrEnum
 from typing import Any
 from uuid import UUID, uuid4
@@ -43,6 +43,11 @@ class RunStatus(StrEnum):
     FAILED = "failed"
 
 
+class RunTrigger(StrEnum):
+    MANUAL = "manual"
+    SCHEDULED = "scheduled"
+
+
 @dataclass(slots=True)
 class UserProfile:
     id: str = "default"
@@ -72,7 +77,7 @@ class Opportunity:
     relevance_reasons: list[str] = field(default_factory=list)
     deadline: date | None = None
     eligibility: dict[str, Any] = field(default_factory=dict)
-    verified_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    verified_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     status: OpportunityStatus = OpportunityStatus.NEW
 
     def validate(self) -> None:
@@ -94,15 +99,16 @@ class Opportunity:
 class Feedback:
     opportunity_id: str
     action: FeedbackAction
-    recorded_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    recorded_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     comment: str | None = None
 
 
 @dataclass(slots=True)
 class WatchRun:
     id: UUID = field(default_factory=uuid4)
+    trigger: RunTrigger = RunTrigger.MANUAL
     status: RunStatus = RunStatus.QUEUED
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     completed_at: datetime | None = None
     opportunities_found: int = 0
     error_message: str | None = None
