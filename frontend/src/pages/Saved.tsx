@@ -1,15 +1,10 @@
 import { useEffect, useState } from "react";
 import { api, type Opportunity } from "../api/client";
 import { OpportunityCard } from "../components/OpportunityCard";
-
-const STATUS_TABS = [
-  { id: "all", label: "Tout" },
-  { id: "new", label: "Nouveau" },
-  { id: "saved", label: "Sauvé" },
-  { id: "dismissed", label: "Passé" },
-];
+import { useLanguage } from "../i18n/LanguageContext";
 
 export default function Saved() {
+  const { t } = useLanguage();
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState<"score" | "deadline">("score");
@@ -26,6 +21,13 @@ export default function Saved() {
       .finally(() => setLoading(false));
   }, []);
 
+  const STATUS_TABS = [
+    { id: "all", label: t.saved.tabAll },
+    { id: "new", label: t.saved.tabNew },
+    { id: "saved", label: t.saved.tabSaved },
+    { id: "dismissed", label: t.saved.tabDismissed },
+  ];
+
   const filtered = opportunities
     .filter((o) => (statusFilter === "all" ? true : o.status === statusFilter))
     .sort((a, b) => {
@@ -36,10 +38,15 @@ export default function Saved() {
     });
 
   async function act(id: string, action: "saved" | "dismissed") {
-    await api.submitFeedback(id, action).catch(() => null);
+    const previous = opportunities;
     setOpportunities((list) =>
       list.map((o) => (o.id === id ? { ...o, status: action } : o))
     );
+    try {
+      await api.submitFeedback(id, action);
+    } catch {
+      setOpportunities(previous);
+    }
   }
 
   return (
@@ -47,10 +54,10 @@ export default function Saved() {
       <div className="flex flex-wrap items-end justify-between gap-space-md border-b border-outline-variant/30 pb-space-lg">
         <div className="flex flex-col gap-space-xs">
           <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
-            Registre local
+            {t.saved.kicker}
           </span>
           <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
-            Opportunités Sauvegardées
+            {t.saved.title}
           </h1>
         </div>
         <div className="flex items-center gap-space-sm">
@@ -78,7 +85,7 @@ export default function Saved() {
             className="flex items-center gap-1.5 rounded border border-outline-variant/40 bg-surface-container px-space-md py-1.5 text-body-sm text-on-surface transition-colors hover:bg-surface-high"
           >
             <span className="material-symbols-outlined text-[16px] text-outline">swap_vert</span>
-            {sortBy === "score" ? "Tri : pertinence" : "Tri : deadline"}
+            {sortBy === "score" ? t.saved.sortScore : t.saved.sortDeadline}
           </button>
         </div>
       </div>
@@ -88,7 +95,7 @@ export default function Saved() {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="h-24 animate-pulse rounded border border-outline-variant/30 bg-surface-low"
+              className="skeleton-shimmer h-24 rounded border border-outline-variant/30"
             />
           ))}
         </div>
@@ -97,45 +104,31 @@ export default function Saved() {
       {!loading && filtered.length === 0 && (
         <div className="flex flex-col items-center gap-space-md rounded border border-outline-variant/30 bg-surface-low py-space-xl text-center">
           <span className="material-symbols-outlined text-[32px] text-outline">bookmark</span>
-          <p className="text-body-lg text-on-surface-variant">
-            Aucune opportunité dans cette catégorie.
-          </p>
+          <p className="text-body-lg text-on-surface-variant">{t.saved.empty}</p>
         </div>
       )}
 
       <div className="flex flex-col gap-space-sm">
-        {filtered.map((opportunity) => (
-          <div key={opportunity.id} className="relative">
+        {filtered.map((opportunity, index) => (
+          <div
+            key={opportunity.id}
+            className="animate-rise"
+            style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
+          >
             <OpportunityCard
               opportunity={opportunity}
               selected={opportunity.id === selectedId}
               onSelect={setSelectedId}
+              action={
+                opportunity.status === "saved"
+                  ? { label: t.saved.archive, onClick: () => act(opportunity.id, "dismissed") }
+                  : {
+                      label: t.saved.save,
+                      onClick: () => act(opportunity.id, "saved"),
+                      primary: true,
+                    }
+              }
             />
-            <div className="absolute bottom-space-md right-space-lg flex gap-space-xs">
-              {opportunity.status === "saved" ? (
-                <button
-                  onClick={() => act(opportunity.id, "dismissed")}
-                  className="rounded border border-outline-variant/40 bg-surface-container px-2 py-1 font-mono text-label-sm text-on-surface hover:bg-surface-high"
-                >
-                  ARCHIVER
-                </button>
-              ) : (
-                <button
-                  onClick={() => act(opportunity.id, "saved")}
-                  className="rounded border border-primary/50 bg-primary/15 px-2 py-1 font-mono text-label-sm text-primary hover:bg-primary/25"
-                >
-                  SAUVER
-                </button>
-              )}
-              <a
-                href={opportunity.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded border border-outline-variant/40 bg-surface-container px-2 py-1 font-mono text-label-sm text-on-surface hover:bg-surface-high"
-              >
-                OUVRIR ↗
-              </a>
-            </div>
           </div>
         ))}
       </div>
