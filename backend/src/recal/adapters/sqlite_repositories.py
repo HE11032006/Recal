@@ -11,8 +11,11 @@ from recal.domain.entities import (
     Opportunity,
     OpportunityStatus,
     OpportunityType,
+    RunStatus,
     UserProfile,
     WatchRun,
+    WatchSettings,
+    WatchState,
 )
 
 
@@ -43,6 +46,10 @@ class SQLiteStore:
                 status TEXT NOT NULL,
                 payload TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS watch_state (
+                id TEXT PRIMARY KEY,
+                payload TEXT NOT NULL
+            );
             """
         )
         self.connection.commit()
@@ -58,7 +65,10 @@ class SQLiteProfileRepository:
         ).fetchone()
         if row is None:
             return UserProfile(interests=["software engineering"])
-        return UserProfile(**json.loads(row["payload"]))
+        data = json.loads(row["payload"])
+        if isinstance(data.get("watch"), dict):
+            data["watch"] = WatchSettings(**data["watch"])
+        return UserProfile(**data)
 
     async def save(self, profile: UserProfile) -> UserProfile:
         payload = json.dumps(asdict(profile))
@@ -81,6 +91,7 @@ class SQLiteOpportunityRepository:
         page_size: int,
         min_score: float | None = None,
         status: str | None = None,
+        since: datetime | None = None,
     ) -> tuple[Sequence[Opportunity], int]:
         conditions: list[str] = []
         values: list[object] = []
@@ -91,15 +102,27 @@ class SQLiteOpportunityRepository:
             conditions.append("status = ?")
             values.append(status)
         where = f" WHERE {' AND '.join(conditions)}" if conditions else ""
-        count = self.store.connection.execute(
-            f"SELECT COUNT(*) AS count FROM opportunities{where}", values
-        ).fetchone()["count"]
-        values.extend([(page - 1) * page_size, page_size])
+        if since is None:
+            count = self.store.connection.execute(
+                f"SELECT COUNT(*) AS count FROM opportunities{where}", values
+            ).fetchone()["count"]
+            values.extend([page_size, (page - 1) * page_size])
+            rows = self.store.connection.execute(
+                f"SELECT payload FROM opportunities{where} ORDER BY relevance_score DESC LIMIT ? OFFSET ?",
+                values,
+            ).fetchall()
+            return [self._deserialize(row["payload"]) for row in rows], count
+        # Filtre temporel : verified_at vit dans le payload JSON, on filtre
+        # côté Python (table petite, MVP). Un index dédié viendra en prod.
         rows = self.store.connection.execute(
-            f"SELECT payload FROM opportunities{where} ORDER BY relevance_score DESC LIMIT ? OFFSET ?",
-            values,
+            f"SELECT payload FROM opportunities{where}", values
         ).fetchall()
-        return [self._deserialize(row["payload"]) for row in rows], count
+        items = [self._deserialize(row["payload"]) for row in rows]
+        items = [item for item in items if item.verified_at >= since]
+        items.sort(key=lambda item: item.relevance_score, reverse=True)
+        total = len(items)
+        start = (page - 1) * page_size
+        return items[start : start + page_size], total
 
     async def get(self, opportunity_id: str) -> Opportunity | None:
         row = self.store.connection.execute(
@@ -165,13 +188,22 @@ class SQLiteRunRepository:
         row = self.store.connection.execute(
             "SELECT payload FROM runs WHERE id = ?", (run_id,)
         ).fetchone()
-        if row is None:
+        return None if row is None else self._deserialize(row["payload"])
+
+    async def get_active(self) -> WatchRun | None:
+        rows = self.store.connection.execute(
+            "SELECT payload FROM runs WHERE status IN ('queued', 'running')"
+        ).fetchall()
+        active_runs = [self._deserialize(row["payload"]) for row in rows]
+        if not active_runs:
             return None
-        data = json.loads(row["payload"])
+        return max(active_runs, key=lambda run: run.created_at)
+
+    @staticmethod
+    def _deserialize(payload: str) -> WatchRun:
         from uuid import UUID
 
-        from recal.domain.entities import RunStatus
-
+        data = json.loads(payload)
         data["id"] = UUID(data["id"])
         data["status"] = RunStatus(data["status"])
         data["created_at"] = datetime.fromisoformat(data["created_at"])
@@ -179,3 +211,59 @@ class SQLiteRunRepository:
             datetime.fromisoformat(data["completed_at"]) if data["completed_at"] else None
         )
         return WatchRun(**data)
+
+
+class SQLiteWatchStateRepository:
+    def __init__(self, store: SQLiteStore) -> None:
+        self.store = store
+
+    async def get(self) -> WatchState:
+        row = self.store.connection.execute(
+            "SELECT payload FROM watch_state WHERE id = 'default'"
+        ).fetchone()
+        if row is None:
+            return WatchState()
+        return self._deserialize(row["payload"])
+
+    async def save(self, state: WatchState) -> WatchState:
+        payload = json.dumps(self._serialize(state))
+        self.store.connection.execute(
+            "INSERT OR REPLACE INTO watch_state (id, payload) VALUES ('default', ?)",
+            (payload,),
+        )
+        self.store.connection.commit()
+        return state
+
+    @staticmethod
+    def _serialize(state: WatchState) -> dict:
+        return {
+            "last_run_at": state.last_run_at.isoformat() if state.last_run_at else None,
+            "next_run_at": state.next_run_at.isoformat() if state.next_run_at else None,
+            "last_successful_run_at": (
+                state.last_successful_run_at.isoformat() if state.last_successful_run_at else None
+            ),
+            "runs_today": state.runs_today,
+            "runs_today_date": (
+                state.runs_today_date.isoformat() if state.runs_today_date else None
+            ),
+            "processed_urls": state.processed_urls,
+        }
+
+    @staticmethod
+    def _deserialize(payload: str) -> WatchState:
+        data = json.loads(payload)
+        data["last_run_at"] = (
+            datetime.fromisoformat(data["last_run_at"]) if data["last_run_at"] else None
+        )
+        data["next_run_at"] = (
+            datetime.fromisoformat(data["next_run_at"]) if data["next_run_at"] else None
+        )
+        data["last_successful_run_at"] = (
+            datetime.fromisoformat(data["last_successful_run_at"])
+            if data["last_successful_run_at"]
+            else None
+        )
+        data["runs_today_date"] = (
+            date.fromisoformat(data["runs_today_date"]) if data["runs_today_date"] else None
+        )
+        return WatchState(**data)
