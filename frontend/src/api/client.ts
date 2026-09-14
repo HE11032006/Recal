@@ -91,15 +91,25 @@ const API_KEY: string =
   (import.meta as unknown as { env: Record<string, string> }).env
     .VITE_API_KEY ?? "";
 
+export const BACKEND_OFFLINE = "BACKEND_OFFLINE";
+
 async function request<T>(path: string, init?: RequestInit, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(`${BASE_URL}/api/v1${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(API_KEY ? { "x-api-key": API_KEY } : {}),
-    },
-    ...init,
-    signal,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${BASE_URL}/api/v1${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(API_KEY ? { "x-api-key": API_KEY } : {}),
+      },
+      ...init,
+      signal,
+    });
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "AbortError") throw e;
+    // Réseau injoignable (backend éteint, mauvaise URL) : code stable
+    // pour afficher un panneau offline dédié au lieu du message brut.
+    throw new Error(BACKEND_OFFLINE);
+  }
   if (response.status === 401) {
     throw new Error("Accès refusé : clé API invalide ou expirée.");
   }
