@@ -9,6 +9,109 @@
     padding: 0;
     overscroll-behavior: none;
   }
+  ::selection {
+    background: rgb(var(--c-selection-bg));
+    color: rgb(var(--c-selection-fg));
+  }
+}
+
+:root {
+  color-scheme: light;
+  --c-surface: 246 246 246;
+  --c-surface-dim: 239 239 239;
+  --c-surface-bright: 255 255 255;
+  --c-surface-lowest: 255 255 255;
+  --c-surface-low: 255 255 255;
+  --c-surface-container: 240 240 240;
+  --c-surface-high: 229 229 229;
+  --c-surface-highest: 215 215 215;
+  --c-on-surface: 20 20 20;
+  --c-on-surface-variant: 79 79 82;
+  --c-outline: 109 109 112;
+  --c-outline-variant: 229 229 229;
+  --c-primary: 20 20 20;
+  --c-primary-container: 41 41 41;
+  --c-primary-fixed: 41 41 41;
+  --c-primary-fixed-dim: 79 79 82;
+  --c-primary-vivid: 45 76 226;
+  --c-on-primary: 255 255 255;
+  --c-on-primary-container: 255 255 255;
+  --c-secondary: 79 79 82;
+  --c-secondary-container: 229 229 229;
+  --c-secondary-fixed: 215 215 215;
+  --c-secondary-fixed-dim: 109 109 112;
+  --c-on-secondary: 255 255 255;
+  --c-on-secondary-container: 20 20 20;
+  --c-on-secondary-fixed: 20 20 20;
+  --c-on-secondary-fixed-variant: 79 79 82;
+  --c-tertiary: 194 65 12;
+  --c-tertiary-container: 222 93 51;
+  --c-on-tertiary: 124 45 18;
+  --c-on-tertiary-container: 73 28 0;
+  --c-error: 220 38 38;
+  --c-error-container: 254 226 226;
+  --c-on-error: 127 29 29;
+  --c-success: 21 128 61;
+  --c-warning: 180 83 9;
+  --c-inverse-surface: 20 20 20;
+  --c-inverse-on-surface: 255 255 255;
+  --c-inverse-primary: 45 76 226;
+  --c-background: 246 246 246;
+  --c-on-background: 20 20 20;
+  --c-selection-bg: 20 20 20;
+  --c-selection-fg: 246 246 246;
+  --c-shimmer-a: 239 239 239;
+  --c-shimmer-b: 255 255 255;
+}
+
+.dark {
+  color-scheme: dark;
+  --c-surface: 17 19 23;
+  --c-surface-dim: 17 19 23;
+  --c-surface-bright: 55 57 61;
+  --c-surface-lowest: 12 14 17;
+  --c-surface-low: 26 28 31;
+  --c-surface-container: 30 32 35;
+  --c-surface-high: 40 42 45;
+  --c-surface-highest: 51 53 56;
+  --c-on-surface: 226 226 230;
+  --c-on-surface-variant: 197 197 216;
+  --c-outline: 142 143 161;
+  --c-outline-variant: 68 70 85;
+  --c-primary: 186 195 255;
+  --c-primary-container: 114 135 255;
+  --c-primary-fixed: 222 224 255;
+  --c-primary-fixed-dim: 186 195 255;
+  --c-primary-vivid: 143 160 255;
+  --c-primary-vivid: 143 160 255;
+  --c-on-primary: 0 31 144;
+  --c-on-primary-container: 0 26 127;
+  --c-secondary: 192 198 216;
+  --c-secondary-container: 66 73 88;
+  --c-secondary-fixed: 220 226 245;
+  --c-secondary-fixed-dim: 192 198 216;
+  --c-on-secondary: 41 49 62;
+  --c-on-secondary-container: 177 184 202;
+  --c-on-secondary-fixed: 21 28 41;
+  --c-on-secondary-fixed-variant: 64 71 85;
+  --c-tertiary: 255 182 143;
+  --c-tertiary-container: 230 111 30;
+  --c-on-tertiary: 84 33 0;
+  --c-on-tertiary-container: 73 28 0;
+  --c-error: 255 180 171;
+  --c-error-container: 147 0 10;
+  --c-on-error: 105 0 5;
+  --c-success: 39 201 63;
+  --c-warning: 247 192 109;
+  --c-inverse-surface: 226 226 230;
+  --c-inverse-on-surface: 47 48 52;
+  --c-inverse-primary: 45 76 226;
+  --c-background: 17 19 23;
+  --c-on-background: 226 226 230;
+  --c-selection-bg: 186 195 255;
+  --c-selection-fg: 17 19 23;
+  --c-shimmer-a: 26 28 31;
+  --c-shimmer-b: 40 42 45;
 }
 
 ::-webkit-scrollbar {
@@ -77,9 +180,9 @@
   .skeleton-shimmer {
     background: linear-gradient(
       90deg,
-      #1a1c1f 25%,
-      #282a2d 50%,
-      #1a1c1f 75%
+      rgb(var(--c-shimmer-a)) 25%,
+      rgb(var(--c-shimmer-b)) 50%,
+      rgb(var(--c-shimmer-a)) 75%
     );
     background-size: 200% 100%;
     animation: recal-shimmer 1.4s linear infinite;
