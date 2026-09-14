@@ -122,3 +122,15 @@ Dictionnaires typés (`src/i18n/dictionaries.ts`), `LanguageProvider` + hook `us
 ### API cloud pour le jury (Lambda Function URL + clé API)
 
 `recal-api-dev` : FastAPI exposée via Mangum sur Function URL publique (AuthType NONE, protection par middleware `x-api-key` actif uniquement si `API_KEY` configurée). Paramètre SAM `ApiKey` (NoEcho). CORS ouvert via `CORS_ALLOW_ALL` pour l'Electron packagé (origin file://). Sécurité : clé jamais loggée/committée, rate-limit 429 + quota quotidien DynamoDB comme remparts coûts, Bedrock limité au modèle exact. Frontend : header `x-api-key` depuis `VITE_API_KEY` (absent en dev = pas de header), erreur 401 explicite. 6 tests `test_api_auth.py` (ouvert/fermé/mauvaise clé/health/preflight). 46 tests verts.
+
+### Refonte Convex cream-paper (branche feat/try-refonte)
+
+Brief DESIGN.md : toile crème #f6f6f6, encre #141414, Inter, hairlines #e5e5e5, zéro ombre, accents sémantiques. Implémentation par remap complet de la palette Tailwind (mêmes tokens, nouvelles valeurs — bonus : `bg-surface-container` jusque-là absent de la config, donc transparent, est réparé). Boutons primary encre remplie, badges deadline clairs (rouge #b91c1c / ambre #92400e), badges type en teintes lisibles (iris, plum, ember), sliders encre, modal détail en carte blanche (fini le glass sombre), skeletons clairs, sélection de texte ink-on-cream. Overlay Electron et fond de fenêtre passés en crème (boutons natifs sinon invisibles). Motion system conservé.
+
+### Gestion erreurs offline + suppression cadratins
+
+Client API : `BACKEND_OFFLINE` levé sur échec réseau (TypeError), distingué des erreurs métier. Panneaux offline dédiés (icône cloud_off, titre localisé, bouton Réessayer qui recharge) sur Today, Saved, Profil (fini les skeletons infinis et le "Failed to fetch" brut). Save/run mappent le code vers le message localisé. Zéro "—" restant dans tout l'UI : remplacés par "·", placeholders localisés ("Sans échéance", "Non renseigné", "Jamais").
+
+### Mode hors-ligne + toggle clair/sombre
+
+Tokens Tailwind résolus via variables CSS (`:root` = Convex cream, `.dark` = palette sombre d'origine) : le thème commute instantanément sans recharger. Store `src/theme.ts` (persisté `recal:theme`, défaut = préférence OS), script anti-flash dans index.html, overlay natif Electron synchronisé via IPC `recal:setTheme`. Toggle Clair/Sombre dans Profil. Cache localStorage des 50 dernières opportunités : backend coupé = bannière "Mode hors-ligne · dernière synchro" + bouton Réessayer sur Today et Saved (au lieu du panneau d'erreur quand un cache existe). Badges et sliders passés en tokens adaptatifs aux deux thèmes.
