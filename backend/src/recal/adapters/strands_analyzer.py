@@ -19,6 +19,8 @@ class ExtractedOpportunity(BaseModel):
     summary: str = Field(min_length=1)
     source_url: HttpUrl
     deadline: date | None = None
+    location: str = ""
+    is_remote: bool = False
     eligibility: dict[str, Any] = Field(default_factory=dict)
     confidence_score: float = Field(ge=0, le=100)
     relevance_reasons: list[str] = Field(default_factory=list)
@@ -66,7 +68,13 @@ class StrandsOpportunityAnalyzer(OpportunityAnalysisPort):
             system_prompt=(
                 "Tu es un analyste strict d'opportunités pour étudiants tech. "
                 "N'invente jamais une date, une condition ou une URL. "
-                "Ignore les pages qui ne décrivent pas une opportunité réelle."
+                "Ignore les pages qui ne décrivent pas une opportunité réelle. "
+                "Règle de localisation : les hackathons et événements en ligne "
+                "(online/virtual/remote) sont accessibles partout. Une opportunité "
+                "physique ou un emploi sur site n'est pertinente que si sa "
+                "localisation correspond au pays de l'utilisateur ou à sa mobilité "
+                "déclarée ; un emploi remote est toujours éligible. "
+                "Utilise country_fit pour refléter strictement cette règle."
             ),
             callback_handler=None,
         )
@@ -82,8 +90,10 @@ class StrandsOpportunityAnalyzer(OpportunityAnalysisPort):
         )
         prompt = f"""
 Profil utilisateur:
+- Nom: {profile.full_name or "non précisé"}
 - Intérêts: {", ".join(profile.interests)}
 - Pays: {", ".join(profile.countries)}
+- Mobilité acceptée: {", ".join(profile.mobility_countries) or profile.countries}
 - Niveau: {profile.study_level}
 - Compétences: {", ".join(profile.skills)}
 
@@ -115,7 +125,11 @@ dans les résultats fournis.
                 confidence_score=item.confidence_score,
                 relevance_reasons=item.relevance_reasons,
                 deadline=item.deadline,
-                eligibility=item.eligibility,
+                eligibility={
+                    **item.eligibility,
+                    **({"location": item.location} if item.location else {}),
+                    **({"remote": item.is_remote} if item.is_remote else {}),
+                },
             )
             opportunity.validate()
             opportunities.append(opportunity)
