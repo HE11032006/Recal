@@ -17,6 +17,13 @@ Parameters:
     Type: String
     Default: rate(1 hour)
     Description: Expression EventBridge Scheduler du cycle de veille.
+  ApiKey:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: >
+      Clé API partagée exigée par l'API publique (header x-api-key).
+      Vide = pas de protection. Génère avec : python -c "import secrets; print(secrets.token_hex(32))".
 
 Resources:
   OpportunitiesTable:
@@ -150,10 +157,61 @@ Resources:
             Action: sqs:SendMessage
             Resource: !GetAtt WorkerDeadLetterQueue.Arn
 
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "recal-api-${Environment}"
+      CodeUri: ../backend/src
+      Handler: recal.main.handler
+      Runtime: python3.12
+      Architectures: [x86_64]
+      Timeout: 600
+      MemorySize: 512
+      Environment:
+        Variables:
+          APP_ENV: !Ref Environment
+          PERSISTENCE_PROVIDER: dynamodb
+          SEARCH_PROVIDER: parallel
+          PARALLEL_SEARCH_ENDPOINT: https://search.parallel.ai/mcp
+          ANALYZER_PROVIDER: strands
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          DYNAMODB_TABLE_OPPORTUNITIES: !Ref OpportunitiesTable
+          DYNAMODB_TABLE_PROFILES: !Ref ProfilesTable
+          DYNAMODB_TABLE_RUNS: !Ref RunsTable
+          DYNAMODB_TABLE_WATCH_STATE: !Ref WatchStateTable
+          AGENT_MAX_TOOL_CALLS: "3"
+          AGENT_TIMEOUT_SECONDS: "300"
+          API_KEY: !Ref ApiKey
+          CORS_ALLOW_ALL: "true"
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OpportunitiesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProfilesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RunsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WatchStateTable
+        - Statement:
+            - Sid: BedrockInvokeTargetModelOnly
+              Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+              Resource:
+                - !Sub "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0"
+                - !Sub "arn:aws:bedrock:*::foundation-model/us.anthropic.claude-haiku-4-5-20251001-v1:0"
+                - !Sub "arn:aws:bedrock:*:${AWS::AccountId}:inference-profile/us.anthropic.claude-haiku-4-5-20251001-v1:0"
+      FunctionUrlConfig:
+        AuthType: NONE
+
 Outputs:
   WorkerFunctionArn:
     Description: ARN du worker Lambda
     Value: !GetAtt WorkerFunction.Arn
+  ApiFunctionUrl:
+    Description: URL publique de l'API (protégée par x-api-key si configurée)
+    Value: !GetAtt ApiFunctionUrl.FunctionUrl
   WorkerDeadLetterQueueUrl:
     Description: URL de la DLQ des cycles en échec
     Value: !Ref WorkerDeadLetterQueue
