@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark" lang="fr">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,6 +14,18 @@
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
       rel="stylesheet"
     />
+    <script>
+      // Thème avant peinture : évite le flash du mauvais thème au démarrage.
+      try {
+        var stored = localStorage.getItem("recal:theme");
+        var dark =
+          stored === "dark" ||
+          (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        if (dark) document.documentElement.classList.add("dark");
+      } catch (e) {
+        /* stockage indisponible : thème clair */
+      }
+    </script>
   </head>
   <body class="bg-surface text-on-surface font-sans antialiased">
     <div id="root"></div>
