@@ -1,16 +1,27 @@
 import { useEffect, useState } from "react";
-import { api, type Profile, type WatchState } from "../api/client";
+import { api, type Profile } from "../api/client";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export default function ProfilePage() {
+  const { t, lang, setLang } = useLanguage();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [watch, setWatch] = useState<WatchState | null>(null);
+  const [watch, setWatch] = useState<import("../api/client").WatchState | null>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
-    api.getProfile().then(setProfile).catch(() => null);
+    api
+      .getProfile()
+      .then((p) => {
+        setProfile(p);
+        if ((p.language === "fr" || p.language === "en") && p.language !== lang) {
+          setLang(p.language);
+        }
+      })
+      .catch(() => null);
     api.getWatchState().then(setWatch).catch(() => null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function refreshWatch() {
@@ -24,7 +35,7 @@ export default function ProfilePage() {
         {[0, 1, 2].map((i) => (
           <div
             key={i}
-            className="h-40 animate-pulse rounded border border-outline-variant/30 bg-surface-low"
+            className="skeleton-shimmer h-40 rounded border border-outline-variant/30"
           />
         ))}
       </div>
@@ -48,9 +59,9 @@ export default function ProfilePage() {
         watch: profile.watch,
       });
       setProfile(updated);
-      setMessage("Profil synchronisé.");
+      setMessage(t.profile.savedMsg);
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Erreur de sauvegarde");
+      setMessage(e instanceof Error ? e.message : t.profile.saveErr);
     } finally {
       setSaving(false);
     }
@@ -60,14 +71,10 @@ export default function ProfilePage() {
     setRunning(true);
     try {
       const run = await api.createRun();
-      setMessage(
-        `Cycle lancé (${run.id.slice(0, 8)}…) — statut : ${run.status}. ${
-          run.opportunities_found > 0 ? `${run.opportunities_found} opportunités trouvées.` : ""
-        }`
-      );
+      setMessage(t.profile.runMsg(run.id, run.status, run.opportunities_found));
       await refreshWatch();
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Erreur cycle");
+      setMessage(e instanceof Error ? e.message : t.profile.runErr);
     } finally {
       setRunning(false);
     }
@@ -76,40 +83,42 @@ export default function ProfilePage() {
   const toggleList = (list: string[], item: string) =>
     list.includes(item) ? list.filter((i) => i !== item) : [...list, item];
 
+  const dateLocale = t.locale;
+
   return (
-    <div className="flex flex-col gap-space-lg">
+    <div className="animate-fade-in flex flex-col gap-space-lg">
       <div className="flex items-end justify-between border-b border-outline-variant/30 pb-space-lg">
         <div className="flex flex-col gap-space-xs">
           <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
-            Console de configuration
+            {t.profile.kicker}
           </span>
           <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
-            Profil & Paramètres de Veille
+            {t.profile.title}
           </h1>
         </div>
         <div className="flex items-center gap-space-sm">
           <button
             onClick={runNow}
             disabled={running}
-            className="flex items-center gap-1.5 rounded border border-outline-variant/40 bg-surface-container px-space-md py-1.5 text-body-sm text-on-surface hover:bg-surface-high disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded border border-outline-variant/40 bg-surface-container px-space-md py-1.5 text-body-sm text-on-surface transition-all hover:bg-surface-high active:scale-95 disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[16px] text-primary">
               {running ? "progress_activity" : "play_arrow"}
             </span>
-            {running ? "Cycle en cours…" : "Lancer un cycle maintenant"}
+            {running ? t.profile.running : t.profile.runBtn}
           </button>
           <button
             onClick={save}
             disabled={saving}
-            className="rounded bg-primary px-space-lg py-1.5 font-medium text-on-primary hover:bg-primary-fixed disabled:opacity-50"
+            className="rounded bg-primary px-space-lg py-1.5 font-medium text-on-primary transition-all hover:bg-primary-fixed hover:shadow-glow active:scale-95 disabled:opacity-50"
           >
-            {saving ? "Sauvegarde…" : "Enregistrer"}
+            {saving ? t.profile.saving : t.profile.saveBtn}
           </button>
         </div>
       </div>
 
       {message && (
-        <div className="rounded border border-primary/40 bg-primary/10 p-space-md text-body-sm text-on-surface">
+        <div className="animate-fade-in rounded border border-primary/40 bg-primary/10 p-space-md text-body-sm text-on-surface">
           {message}
         </div>
       )}
@@ -137,20 +146,23 @@ export default function ProfilePage() {
 
           <div className="flex flex-col gap-space-xs">
             <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-              Langue de l'interface
+              {t.profile.langLabel}
             </span>
             <div className="grid grid-cols-2 gap-1 rounded border border-outline-variant/40 bg-surface-lowest p-1">
-              {(["fr", "en"] as const).map((lang) => (
+              {(["fr", "en"] as const).map((l) => (
                 <button
-                  key={lang}
-                  onClick={() => setProfile({ ...profile, language: lang })}
+                  key={l}
+                  onClick={() => {
+                    setProfile({ ...profile, language: l });
+                    setLang(l);
+                  }}
                   className={`rounded py-1.5 font-medium transition-all ${
-                    profile.language === lang
+                    profile.language === l
                       ? "bg-surface-high text-on-surface shadow-sm"
                       : "text-on-surface-variant hover:text-on-surface"
                   }`}
                 >
-                  {lang === "fr" ? "FR Français" : "EN English"}
+                  {l === "fr" ? "FR Français" : "EN English"}
                 </button>
               ))}
             </div>
@@ -158,7 +170,7 @@ export default function ProfilePage() {
 
           <div className="flex flex-col gap-space-xs">
             <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-              Centres d'intérêt
+              {t.profile.interests}
             </span>
             <input
               value={profile.interests.join(", ")}
@@ -168,14 +180,14 @@ export default function ProfilePage() {
                   interests: e.target.value.split(",").map((s) => s.trim()).filter(Boolean),
                 })
               }
-              placeholder="IA, Web, Data…"
+              placeholder={t.profile.interestsPh}
               className="h-11 rounded border-none bg-surface-lowest px-3.5 text-on-surface placeholder:text-outline focus:outline-none"
             />
           </div>
 
           <div className="flex flex-col gap-space-xs">
             <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-              Compétences & stack technique
+              {t.profile.skills}
             </span>
             <input
               value={profile.skills.join(", ")}
@@ -185,7 +197,7 @@ export default function ProfilePage() {
                   skills: e.target.value.split(",").map((s) => s.trim()).filter(Boolean),
                 })
               }
-              placeholder="Python, React, Docker…"
+              placeholder={t.profile.skillsPh}
               className="h-11 rounded border-none bg-surface-lowest px-3.5 text-on-surface placeholder:text-outline focus:outline-none"
             />
           </div>
@@ -193,7 +205,7 @@ export default function ProfilePage() {
           <div className="grid grid-cols-2 gap-space-md">
             <div className="flex flex-col gap-space-xs">
               <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                Niveau actuel
+                {t.profile.level}
               </span>
               <input
                 value={profile.study_level}
@@ -203,7 +215,7 @@ export default function ProfilePage() {
             </div>
             <div className="flex flex-col gap-space-xs">
               <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                Pays
+                {t.profile.country}
               </span>
               <input
                 value={profile.countries.join(", ")}
@@ -222,7 +234,7 @@ export default function ProfilePage() {
         <div className="flex flex-col gap-space-lg rounded border border-outline-variant/40 bg-surface-low p-space-xl">
           <div className="flex items-center justify-between">
             <span className="font-mono text-label-md uppercase tracking-wider text-on-surface">
-              Configuration des cycles
+              {t.profile.cyclesTitle}
             </span>
             <button
               onClick={() =>
@@ -231,7 +243,7 @@ export default function ProfilePage() {
                   watch: { ...profile.watch, enabled: !profile.watch.enabled },
                 })
               }
-              className={`flex items-center gap-2 rounded border px-2.5 py-1 font-mono text-label-sm transition-colors ${
+              className={`flex items-center gap-2 rounded border px-2.5 py-1 font-mono text-label-sm transition-all active:scale-95 ${
                 profile.watch.enabled
                   ? "border-success/50 bg-success/15 text-success"
                   : "border-outline-variant/40 bg-surface-lowest text-outline"
@@ -242,16 +254,18 @@ export default function ProfilePage() {
                   profile.watch.enabled ? "bg-success" : "bg-outline"
                 }`}
               />
-              {profile.watch.enabled ? "VEILLE ACTIVE" : "VEILLE EN PAUSE"}
+              {profile.watch.enabled ? t.profile.watchOn : t.profile.watchOff}
             </button>
           </div>
 
           <div className="flex flex-col gap-space-xs">
             <div className="flex justify-between font-mono text-label-sm">
               <span className="uppercase tracking-wider text-on-surface-variant">
-                Fréquence des cycles
+                {t.profile.frequency}
               </span>
-              <span className="text-on-surface">{profile.watch.frequency_minutes} min</span>
+              <span className="text-on-surface">
+                {profile.watch.frequency_minutes} {t.onboarding.minUnit}
+              </span>
             </div>
             <input
               type="range"
@@ -275,7 +289,7 @@ export default function ProfilePage() {
           <div className="flex flex-col gap-space-xs">
             <div className="flex justify-between font-mono text-label-sm">
               <span className="uppercase tracking-wider text-on-surface-variant">
-                Seuil de pertinence minimal
+                {t.profile.threshold}
               </span>
               <span className="text-on-surface">{profile.relevance_threshold}</span>
             </div>
@@ -296,17 +310,12 @@ export default function ProfilePage() {
 
           <div className="flex flex-col gap-space-sm">
             <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-              Types surveillés
+              {t.profile.typesWatched}
             </span>
             <div className="flex flex-wrap gap-1.5">
-              {[
-                "hackathon",
-                "internship",
-                "fellowship",
-                "scholarship",
-                "conference",
-                "certification",
-              ].map((type) => (
+              {(
+                ["hackathon", "internship", "fellowship", "scholarship", "conference", "certification"] as const
+              ).map((type) => (
                 <button
                   key={type}
                   onClick={() =>
@@ -318,13 +327,13 @@ export default function ProfilePage() {
                       },
                     })
                   }
-                  className={`rounded border px-2.5 py-1 font-mono text-label-sm uppercase transition-colors ${
+                  className={`rounded border px-2.5 py-1 font-mono text-label-sm uppercase transition-all active:scale-95 ${
                     profile.watch.opportunity_types.includes(type)
                       ? "border-primary/60 bg-primary/15 text-primary"
                       : "border-outline-variant/40 bg-surface-lowest text-on-surface-variant hover:text-on-surface"
                   }`}
                 >
-                  {type}
+                  {t.types[type]}
                 </button>
               ))}
             </div>
@@ -332,7 +341,7 @@ export default function ProfilePage() {
 
           <div className="flex flex-col gap-space-xs">
             <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-              Domaines autorisés
+              {t.profile.domains}
             </span>
             <textarea
               value={profile.watch.allowed_domains.join("\n")}
@@ -352,22 +361,20 @@ export default function ProfilePage() {
               placeholder={"devpost.com\nmlh.io\nunstop.com"}
               className="rounded border-none bg-surface-lowest p-3 font-mono text-label-sm text-on-surface placeholder:text-outline focus:outline-none"
             />
-            <p className="font-mono text-label-sm text-outline">
-              Un domaine par ligne. Vide = catalogue par défaut de l'agent.
-            </p>
+            <p className="font-mono text-label-sm text-outline">{t.profile.domainsHint}</p>
           </div>
 
           <div className="mt-auto flex flex-col gap-2 rounded border border-outline-variant/30 bg-surface-lowest p-space-md font-mono text-label-sm">
             <span className="uppercase tracking-wider text-on-surface-variant">
-              État de l'agent
+              {t.profile.agentState}
             </span>
             {watch ? (
               <>
                 <div className="flex items-center justify-between">
-                  <span className="text-outline">DERNIER CYCLE</span>
+                  <span className="text-outline">{t.profile.lastRun}</span>
                   <span className="text-on-surface">
                     {watch.last_run_at
-                      ? new Date(watch.last_run_at).toLocaleString("fr-FR", {
+                      ? new Date(watch.last_run_at).toLocaleString(dateLocale, {
                           day: "2-digit",
                           month: "short",
                           hour: "2-digit",
@@ -377,10 +384,10 @@ export default function ProfilePage() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-outline">PROCHAIN CYCLE</span>
+                  <span className="text-outline">{t.profile.nextRun}</span>
                   <span className="text-on-surface">
                     {watch.next_run_at
-                      ? new Date(watch.next_run_at).toLocaleString("fr-FR", {
+                      ? new Date(watch.next_run_at).toLocaleString(dateLocale, {
                           hour: "2-digit",
                           minute: "2-digit",
                         })
@@ -388,25 +395,25 @@ export default function ProfilePage() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-outline">CYCLES AUJOURD'HUI</span>
+                  <span className="text-outline">{t.profile.runsToday}</span>
                   <span className="text-on-surface">
                     {watch.runs_today} / {watch.daily_max_runs}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-outline">URLS ANALYSÉES</span>
+                  <span className="text-outline">{t.profile.urlsAnalyzed}</span>
                   <span className="text-on-surface">{watch.processed_urls_count}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-outline">EXÉCUTION</span>
+                  <span className="text-outline">{t.profile.execution}</span>
                   <span className="flex items-center gap-1 text-success">
                     <span className="h-1.5 w-1.5 rounded-full bg-success" />
-                    CLOUD — EventBridge
+                    {t.profile.cloudLabel}
                   </span>
                 </div>
               </>
             ) : (
-              <span className="text-outline">État indisponible — backend hors ligne ?</span>
+              <span className="text-outline">{t.profile.stateOffline}</span>
             )}
           </div>
         </div>
