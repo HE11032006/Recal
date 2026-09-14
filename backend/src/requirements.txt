@@ -1,6 +1,9 @@
 boto3
+fastapi
 httpx
+mangum
 pydantic
 pydantic-settings
 python-dotenv
+sentry-sdk
 strands-agents
