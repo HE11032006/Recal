@@ -5,6 +5,13 @@
 [![Backend CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+## Live Links
+
+- Donwload a file: 
+- GitHub repository: https://github.com/pjmorales1123/padayon
+- Usage guide: [docs/USAGE_GUIDE.md](docs/USAGE_GUIDE.md)
+- Demo readiness notes: [docs/demo-readiness-report.md](docs/demo-readiness-report.md)
+
 ## Description
 
 Recal est un agent autonome de veille destiné aux étudiants et aux jeunes diplômés. Il surveille les hackathons, stages, fellowships, bourses, conférences et certifications afin de faire ressortir uniquement les opportunités qui correspondent réellement au profil de l’utilisateur.
