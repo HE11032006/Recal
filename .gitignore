@@ -54,4 +54,7 @@ skill.md
 .claude/
 backend/.agents/
 backend/.claude/
+
+# Stray personal folders (never commit)
+frontend/Downloads/
 SECURITY.md
