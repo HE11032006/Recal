@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Protocol
 
-from recal.domain.entities import Opportunity, UserProfile, WatchRun
+from recal.domain.entities import Opportunity, UserProfile, WatchRun, WatchState
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,6 +46,7 @@ class OpportunityRepository(Protocol):
         page_size: int,
         min_score: float | None = None,
         status: str | None = None,
+        since: datetime | None = None,
     ) -> tuple[Sequence[Opportunity], int]: ...
 
     async def get(self, opportunity_id: str) -> Opportunity | None: ...
@@ -59,6 +61,27 @@ class RunRepository(Protocol):
 
     async def get(self, run_id: str) -> WatchRun | None: ...
 
+    async def get_active(self) -> WatchRun | None:
+        """Retourner le cycle en cours (running/queued), sinon None."""
+
+
+class WatchStateRepository(Protocol):
+    async def get(self) -> WatchState: ...
+
+    async def save(self, state: WatchState) -> WatchState: ...
+
+
+class Clock(Protocol):
+    """Horloge injectable pour tester la planification sans attendre."""
+
+    def now(self) -> datetime: ...
+
 
 class WatchRunner(Protocol):
-    async def execute(self, run: WatchRun, profile: UserProfile) -> WatchRun: ...
+    async def execute(
+        self,
+        run: WatchRun,
+        profile: UserProfile,
+        *,
+        processed_urls: Sequence[str] = (),
+    ) -> WatchRun: ...
