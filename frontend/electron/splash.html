@@ -11,17 +11,34 @@
       body {
         width: 480px;
         height: 320px;
-        background: #111317;
+        background: #111317 url("splash-bg.png") center / cover no-repeat;
         border: 1px solid #444655;
         border-radius: 8px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        gap: 24px;
+        justify-content: flex-end;
+        gap: 12px;
+        padding-bottom: 24px;
         font-family: "JetBrains Mono", "Consolas", monospace;
         overflow: hidden;
         position: relative;
+      }
+      body::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          rgba(17, 19, 23, 0.88) 0%,
+          rgba(17, 19, 23, 0.25) 55%,
+          rgba(17, 19, 23, 0.45) 100%
+        );
+        pointer-events: none;
+      }
+      body > * {
+        position: relative;
+        z-index: 1;
       }
       .logo {
         width: 72px;
@@ -56,9 +73,9 @@
         }
       }
       .spinner {
-        width: 44px;
-        height: 44px;
-        border: 3px solid #1e2023;
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(226, 226, 230, 0.15);
         border-top-color: #bac3ff;
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
@@ -112,8 +129,6 @@
     </style>
   </head>
   <body>
-    <div class="logo">R</div>
-    <div class="title">Recal</div>
     <div class="spinner"></div>
     <div class="status">Initialisation de l'agent</div>
   </body>
