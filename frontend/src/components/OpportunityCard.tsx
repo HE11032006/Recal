@@ -1,14 +1,16 @@
 import type { Opportunity, OpportunityType } from "../api/client";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function TypeBadge({ type }: { type: OpportunityType }) {
+  const { t } = useLanguage();
   const labels: Record<OpportunityType, string> = {
-    hackathon: "HACKATHON",
-    internship: "STAGE",
-    fellowship: "FELLOWSHIP",
-    scholarship: "BOURSE",
-    conference: "CONFÉRENCE",
-    certification: "CERTIFICATION",
-    other: "AUTRE",
+    hackathon: t.typeBadges.hackathon,
+    internship: t.typeBadges.internship,
+    fellowship: t.typeBadges.fellowship,
+    scholarship: t.typeBadges.scholarship,
+    conference: t.typeBadges.conference,
+    certification: t.typeBadges.certification,
+    other: t.typeBadges.other,
   };
   const tone =
     type === "hackathon"
@@ -90,6 +92,7 @@ export function DeadlineBadge({ deadline }: { deadline: string | null }) {
 }
 
 export function MatchLine({ score }: { score: number }) {
+  const { t } = useLanguage();
   const strong = score >= 85;
   const medium = score >= 70;
   return (
@@ -99,10 +102,10 @@ export function MatchLine({ score }: { score: number }) {
           {strong ? "verified" : medium ? "check_circle" : "info"}
         </span>
         <span className="font-semibold uppercase">
-          {strong ? "Match fort" : medium ? "Match moyen" : "Faible correspondance"}
+          {strong ? t.card.matchStrong : medium ? t.card.matchMedium : t.card.matchWeak}
         </span>
       </div>
-      <span className="text-outline">COMPATIBILITÉ {Math.round(score)}%</span>
+      <span className="text-outline">{t.card.compatPrefix} {Math.round(score)}%</span>
     </div>
   );
 }
@@ -125,18 +128,21 @@ export function OpportunityCard({
   opportunity,
   selected,
   onSelect,
+  action,
 }: {
   opportunity: Opportunity;
   selected: boolean;
   onSelect: (id: string) => void;
+  action?: { label: string; onClick: () => void; primary?: boolean };
 }) {
+  const { t } = useLanguage();
   return (
     <div
       onClick={() => onSelect(opportunity.id)}
-      className={`flex cursor-pointer flex-col rounded-r p-space-lg transition-all duration-150 ${
+      className={`flex cursor-pointer flex-col rounded-r p-space-lg transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.995] ${
         selected
-          ? "border-y border-r border-l-2 border-l-primary border-outline-variant/60 bg-surface-high"
-          : "border border-outline-variant/30 bg-surface-low hover:border-outline-variant/70 hover:bg-surface-container"
+          ? "border-y border-r border-l-2 border-l-primary border-outline-variant/60 bg-surface-high shadow-glow-sm"
+          : "border border-outline-variant/30 bg-surface-low hover:border-primary/40 hover:bg-surface-container hover:shadow-glow-sm"
       }`}
     >
       <div className="flex items-start justify-between gap-space-md">
@@ -145,7 +151,7 @@ export function OpportunityCard({
             <TypeBadge type={opportunity.type} />
             <span className="font-mono text-label-sm text-outline uppercase">
               {opportunity.verified_at
-                ? new Date(opportunity.verified_at).toLocaleDateString("fr-FR")
+                ? new Date(opportunity.verified_at).toLocaleDateString(t.locale)
                 : ""}
             </span>
           </div>
@@ -178,18 +184,35 @@ export function OpportunityCard({
         </div>
       </div>
       <div className="mt-space-sm flex items-center justify-between">
-        <a
-          href={opportunity.source_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
-          className="rounded border border-outline-variant/40 bg-surface-container px-2 py-0.5 font-mono text-label-sm text-on-surface transition-colors hover:border-primary/50 hover:text-primary"
+        <div className="flex items-center gap-space-xs">
+          {action && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                action.onClick();
+              }}
+              className={`rounded border px-2 py-0.5 font-mono text-label-sm transition-colors ${
+                action.primary
+                  ? "border-primary/50 bg-primary/15 text-primary hover:bg-primary/25"
+                  : "border-outline-variant/40 bg-surface-container text-on-surface hover:bg-surface-high"
+              }`}
+            >
+              {action.label}
+            </button>
+          )}
+          <a
+            href={opportunity.source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="rounded border border-outline-variant/40 bg-surface-container px-2 py-0.5 font-mono text-label-sm text-on-surface transition-colors hover:border-primary/50 hover:text-primary"
           title={opportunity.source_url}
         >
-          OUVRIR ↗
+          {t.card.openLink}
         </a>
+        </div>
         <span className="flex items-center gap-1 font-mono text-label-sm text-primary">
-          DÉTAIL
+          {t.card.detail}
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
         </span>
       </div>
