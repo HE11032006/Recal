@@ -82,12 +82,27 @@ const BASE_URL: string =
   (import.meta as unknown as { env: Record<string, string> }).env
     .VITE_API_URL ?? "http://127.0.0.1:8000";
 
+// Clé API injectée au build (VITE_API_KEY). Absente en dev local :
+// aucun header envoyé, le backend local reste ouvert.
+// Dans le bundle packagé la clé est lisible par extraction — protection
+// anti-abus occasionnels uniquement. Les vrais remparts coûts sont le
+// rate-limit (429) et le quota quotidien partagé via DynamoDB.
+const API_KEY: string =
+  (import.meta as unknown as { env: Record<string, string> }).env
+    .VITE_API_KEY ?? "";
+
 async function request<T>(path: string, init?: RequestInit, signal?: AbortSignal): Promise<T> {
   const response = await fetch(`${BASE_URL}/api/v1${path}`, {
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(API_KEY ? { "x-api-key": API_KEY } : {}),
+    },
     ...init,
     signal,
   });
+  if (response.status === 401) {
+    throw new Error("Accès refusé : clé API invalide ou expirée.");
+  }
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
     throw new Error(body.detail ?? `Erreur ${response.status}`);
