@@ -12,13 +12,19 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
 
     aws_region: str = "us-east-1"
-    bedrock_model_id: str = "anthropic.claude-haiku-4-5-20251001-v1:0"
+    bedrock_model_id: str = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+    search_provider: str = "parallel"
+    parallel_search_endpoint: str = "https://search.parallel.ai/mcp"
+    analyzer_provider: str = "fake"
     tavily_api_key: str = ""
     tavily_max_results: int = 5
 
     dynamodb_table_opportunities: str = "recal-opportunities-dev"
     dynamodb_table_profiles: str = "recal-profiles-dev"
     dynamodb_table_runs: str = "recal-runs-dev"
+    dynamodb_table_watch_state: str = "recal-watch-state-dev"
+
+    persistence_provider: str = "sqlite"
 
     agent_max_tool_calls: int = 3
     agent_timeout_seconds: int = 60
