@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
@@ -25,12 +26,51 @@ class HealthResponse(BaseModel):
     version: str = "0.1.0"
 
 
+class WatchSettingsUpdate(BaseModel):
+    enabled: bool = True
+    frequency_minutes: int = Field(default=60, ge=15, le=10080)
+    allowed_domains: list[str] = Field(default_factory=list, max_length=100)
+    opportunity_types: list[str] = Field(
+        default_factory=lambda: [
+            "hackathon",
+            "internship",
+            "fellowship",
+            "scholarship",
+            "conference",
+            "certification",
+        ],
+        max_length=10,
+    )
+    max_queries_per_run: int = Field(default=3, ge=1, le=10)
+    max_results_per_query: int = Field(default=5, ge=1, le=10)
+    minimum_relevance_score: float | None = Field(default=None, ge=0, le=100)
+    daily_max_runs: int = Field(default=12, ge=1, le=96)
+
+    @field_validator("allowed_domains", "opportunity_types")
+    @classmethod
+    def normalize_lists(cls, values: list[str]) -> list[str]:
+        return _clean_list(values)
+
+
+class WatchSettingsResponse(WatchSettingsUpdate):
+    pass
+
+
 class UserProfileUpdate(BaseModel):
+    full_name: str = Field(default="", max_length=120)
+    language: Literal["fr", "en"] = "fr"
     interests: list[str] = Field(min_length=1, max_length=20)
     countries: list[str] = Field(default_factory=list, max_length=20)
+    mobility_countries: list[str] = Field(default_factory=list, max_length=20)
     study_level: str = Field(default="", max_length=100)
     skills: list[str] = Field(default_factory=list, max_length=30)
     relevance_threshold: float = Field(default=70, ge=0, le=100)
+    watch: WatchSettingsUpdate = Field(default_factory=WatchSettingsUpdate)
+
+    @field_validator("full_name", "study_level")
+    @classmethod
+    def normalize_text(cls, value: str) -> str:
+        return value.strip()
 
     @field_validator("interests", "countries", "skills")
     @classmethod
@@ -101,6 +141,18 @@ class RunResponse(BaseModel):
     completed_at: datetime | None = None
     opportunities_found: int = 0
     error_message: str | None = None
+    urls_processed: list[str] = Field(default_factory=list)
+
+
+class WatchStateResponse(BaseModel):
+    last_run_at: datetime | None = None
+    next_run_at: datetime | None = None
+    last_successful_run_at: datetime | None = None
+    runs_today: int = 0
+    daily_max_runs: int = 12
+    processed_urls_count: int = 0
+    enabled: bool = True
+    frequency_minutes: int = 60
 
 
 class ErrorResponse(BaseModel):
