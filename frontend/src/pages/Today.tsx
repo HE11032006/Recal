@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { api, type Opportunity } from "../api/client";
+import { api, BACKEND_OFFLINE, type Opportunity } from "../api/client";
+import { readCache, writeCache } from "../api/cache";
 import { OpportunityCard, SegmentedBar, TypeBadge } from "../components/OpportunityCard";
 import { useLanguage } from "../i18n/LanguageContext";
 
@@ -10,14 +11,34 @@ export default function Today() {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
+    setCachedAt(null);
     api
       .listOpportunities({ page: 1, page_size: 50 })
-      .then((page) => setOpportunities(page.items))
-      .catch((e) => setError(e instanceof Error ? e.message : "API error"))
+      .then((page) => {
+        setOpportunities(page.items);
+        writeCache(page.items);
+      })
+      .catch((e) => {
+        if (e instanceof Error && e.message === BACKEND_OFFLINE) {
+          const cached = readCache();
+          if (cached.items.length > 0) {
+            setOpportunities(cached.items);
+            setCachedAt(cached.at);
+            return;
+          }
+          setError(BACKEND_OFFLINE);
+          return;
+        }
+        setError(t.common.requestFailed);
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [reloadKey, t]);
 
   const filtered = useMemo(() => {
     if (filter === "all") return opportunities;
@@ -112,8 +133,23 @@ export default function Today() {
       )}
 
       {error && !loading && (
-        <div className="rounded border border-error/40 bg-error-container/20 p-space-lg text-body-md text-error">
-          {error} {t.today.errorBackend}
+        <div className="animate-fade-in flex flex-col items-center gap-space-md rounded-xl border border-outline-variant bg-surface-low px-space-xl py-space-xl text-center">
+          <span className="material-symbols-outlined text-[32px] text-outline">
+            {error === BACKEND_OFFLINE ? "cloud_off" : "error"}
+          </span>
+          <p className="text-body-lg font-medium text-on-surface">
+            {error === BACKEND_OFFLINE ? t.common.offlineTitle : t.common.requestFailed}
+          </p>
+          {error === BACKEND_OFFLINE && (
+            <p className="max-w-md font-mono text-label-sm text-outline">{t.common.offlineBody}</p>
+          )}
+          <button
+            onClick={() => setReloadKey((k) => k + 1)}
+            className="flex items-center gap-1.5 rounded-lg bg-primary px-space-lg py-2 font-medium text-on-primary transition-all hover:bg-primary-fixed active:scale-95"
+          >
+            <span className="material-symbols-outlined text-[16px]">refresh</span>
+            {t.common.retry}
+          </button>
         </div>
       )}
 
@@ -127,6 +163,32 @@ export default function Today() {
 
       {!error && filtered.length > 0 && (
         <>
+          {cachedAt && (
+            <div className="animate-fade-in flex flex-wrap items-center justify-between gap-space-sm rounded-xl border border-warning/40 bg-warning/10 px-space-lg py-space-md">
+              <div className="flex items-center gap-space-sm">
+                <span className="material-symbols-outlined text-[18px] text-warning">cloud_off</span>
+                <span className="font-mono text-label-sm font-medium uppercase tracking-wider text-on-surface">
+                  {t.common.offlineBanner}
+                </span>
+                <span className="font-mono text-label-sm text-outline">
+                  {t.common.lastSync} :{" "}
+                  {new Date(cachedAt).toLocaleString(t.locale, {
+                    day: "2-digit",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </div>
+              <button
+                onClick={() => setReloadKey((k) => k + 1)}
+                className="flex items-center gap-1.5 rounded-lg border border-warning/50 px-space-md py-1.5 font-mono text-label-sm text-on-surface transition-all hover:bg-warning/15 active:scale-95"
+              >
+                <span className="material-symbols-outlined text-[16px]">refresh</span>
+                {t.common.retry}
+              </button>
+            </div>
+          )}
           <div className="grid grid-cols-1 gap-space-md lg:grid-cols-2">
             {filtered.map((opportunity, index) => (
               <div
@@ -161,7 +223,7 @@ export default function Today() {
           onClick={() => setSelected(null)}
         >
           <div
-            className="animate-scale-in glass flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded border border-outline-variant/50 shadow-lift"
+            className="animate-scale-in flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-outline-variant bg-surface-low"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-outline-variant/30 bg-surface-lowest px-space-lg py-space-md">
@@ -219,13 +281,13 @@ export default function Today() {
                   </span>
                 </div>
                 <div className="flex flex-col rounded bg-surface-low p-2">
-                  <span className="font-mono text-label-sm uppercase text-[#ff8f8f]">
+                  <span className="font-mono text-label-sm uppercase text-error">
                     {t.today.fieldDeadline}
                   </span>
-                  <span className="mt-0.5 font-semibold text-[#ff8f8f]">
+                  <span className="mt-0.5 font-semibold text-error">
                     {selected.deadline
                       ? new Date(selected.deadline).toLocaleDateString(t.locale)
-                      : "—"}
+                      : t.card.noDeadline}
                   </span>
                 </div>
               </div>
@@ -321,7 +383,7 @@ export default function Today() {
                 href={selected.source_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-1 items-center justify-center gap-2 rounded bg-primary px-space-lg py-2 font-medium text-on-primary shadow-sm transition-colors hover:bg-primary-fixed"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-space-lg py-2 font-medium text-on-primary transition-colors hover:bg-primary-fixed"
               >
                 {t.today.openSite}
                 <span className="material-symbols-outlined text-[16px]">open_in_new</span>
