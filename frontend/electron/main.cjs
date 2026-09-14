@@ -12,6 +12,8 @@ app.on("before-quit", () => {
   isQuiting = true;
 });
 
+const APP_ICON = path.join(__dirname, "app-icon.png");
+
 function createSplash() {
   splash = new BrowserWindow({
     width: 480,
@@ -22,6 +24,7 @@ function createSplash() {
     backgroundColor: "#00000000",
     center: true,
     show: true,
+    icon: nativeImage.createFromPath(APP_ICON),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -38,6 +41,7 @@ function createWindow() {
     minWidth: 1024,
     minHeight: 700,
     backgroundColor: "#111317",
+    icon: nativeImage.createFromPath(APP_ICON),
     titleBarStyle: "hidden",
     titleBarOverlay: {
       color: "#111317",
@@ -83,9 +87,10 @@ function createWindow() {
 }
 
 function createTray() {
-  const icon = nativeImage.createFromPath(path.join(__dirname, "tray-icon.png"));
-  tray = new Tray(icon);
-  tray.setToolTip("Recal — agent de veille actif");
+  try {
+    const icon = nativeImage.createFromPath(APP_ICON);
+    tray = new Tray(icon.resize({ width: 16, height: 16 }));
+  tray.setToolTip("Recal agent de veille actif");
   tray.setContextMenu(
     Menu.buildFromTemplate([
       { label: "Afficher Recal", click: () => mainWindow && mainWindow.show() },
@@ -107,6 +112,11 @@ function createTray() {
       mainWindow.show();
     }
   });
+  } catch (err) {
+    // Linux sans indicateur système : pas de tray, l'icône reste en barre des tâches.
+    console.warn("Tray indisponible :", err && err.message ? err.message : err);
+    tray = null;
+  }
 }
 
 app.whenReady().then(() => {
@@ -119,7 +129,10 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", () => {
-  // Ne jamais quitter : l'agent continue dans le tray.
+  // Fenêtre fermée mais tray actif : l'agent continue en arrière-plan.
+  // Sans tray (Linux sans indicateur) ni macOS : quitter proprement.
+  if (process.platform === "darwin") return;
+  if (!tray) app.quit();
 });
 
 function ipcHandlers() {
