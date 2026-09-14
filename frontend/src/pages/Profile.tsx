@@ -1,16 +1,21 @@
-import { useEffect, useState } from "react";
-import { api, type Profile } from "../api/client";
+﻿import { useEffect, useState } from "react";
+import { api, BACKEND_OFFLINE, type Profile, type WatchState } from "../api/client";
 import { useLanguage } from "../i18n/LanguageContext";
+import { useTheme } from "../theme";
 
 export default function ProfilePage() {
   const { t, lang, setLang } = useLanguage();
+  const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [watch, setWatch] = useState<import("../api/client").WatchState | null>(null);
+  const [watch, setWatch] = useState<WatchState | null>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    setLoadError(false);
     api
       .getProfile()
       .then((p) => {
@@ -19,10 +24,10 @@ export default function ProfilePage() {
           setLang(p.language);
         }
       })
-      .catch(() => null);
+      .catch(() => setLoadError(true));
     api.getWatchState().then(setWatch).catch(() => null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [reloadKey]);
 
   async function refreshWatch() {
     const state = await api.getWatchState().catch(() => null);
@@ -30,6 +35,22 @@ export default function ProfilePage() {
   }
 
   if (!profile) {
+    if (loadError) {
+      return (
+        <div className="animate-fade-in flex flex-col items-center gap-space-md rounded-xl border border-outline-variant bg-surface-low px-space-xl py-space-xl text-center">
+          <span className="material-symbols-outlined text-[32px] text-outline">cloud_off</span>
+          <p className="text-body-lg font-medium text-on-surface">{t.common.offlineTitle}</p>
+          <p className="max-w-md font-mono text-label-sm text-outline">{t.common.offlineBody}</p>
+          <button
+            onClick={() => setReloadKey((k) => k + 1)}
+            className="flex items-center gap-1.5 rounded-lg bg-primary px-space-lg py-2 font-medium text-on-primary transition-all hover:bg-primary-fixed active:scale-95"
+          >
+            <span className="material-symbols-outlined text-[16px]">refresh</span>
+            {t.common.retry}
+          </button>
+        </div>
+      );
+    }
     return (
       <div className="flex flex-col gap-2">
         {[0, 1, 2].map((i) => (
@@ -61,7 +82,11 @@ export default function ProfilePage() {
       setProfile(updated);
       setMessage(t.profile.savedMsg);
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : t.profile.saveErr);
+      setMessage(
+        e instanceof Error && e.message === BACKEND_OFFLINE
+          ? t.common.offlineTitle
+          : (e instanceof Error ? e.message : t.profile.saveErr)
+      );
     } finally {
       setSaving(false);
     }
@@ -74,7 +99,11 @@ export default function ProfilePage() {
       setMessage(t.profile.runMsg(run.id, run.status, run.opportunities_found));
       await refreshWatch();
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : t.profile.runErr);
+      setMessage(
+        e instanceof Error && e.message === BACKEND_OFFLINE
+          ? t.common.offlineTitle
+          : (e instanceof Error ? e.message : t.profile.runErr)
+      );
     } finally {
       setRunning(false);
     }
@@ -158,11 +187,35 @@ export default function ProfilePage() {
                   }}
                   className={`rounded py-1.5 font-medium transition-all ${
                     profile.language === l
-                      ? "bg-surface-high text-on-surface shadow-sm"
+                      ? "bg-surface-high text-on-surface"
                       : "text-on-surface-variant hover:text-on-surface"
                   }`}
                 >
                   {l === "fr" ? "FR Français" : "EN English"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-space-xs">
+            <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
+              {t.profile.themeLabel}
+            </span>
+            <div className="grid grid-cols-2 gap-1 rounded border border-outline-variant/40 bg-surface-lowest p-1">
+              {(["light", "dark"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setTheme(mode)}
+                  className={`flex items-center justify-center gap-2 rounded py-1.5 font-medium transition-all active:scale-95 ${
+                    theme === mode
+                      ? "bg-surface-high text-on-surface shadow-sm"
+                      : "text-on-surface-variant hover:text-on-surface"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[16px]">
+                    {mode === "light" ? "light_mode" : "dark_mode"}
+                  </span>
+                  {mode === "light" ? t.profile.themeLight : t.profile.themeDark}
                 </button>
               ))}
             </div>
@@ -282,7 +335,7 @@ export default function ProfilePage() {
                   },
                 })
               }
-              className="accent-[#bac3ff]"
+              className="accent-[rgb(var(--c-primary))]"
             />
           </div>
 
@@ -304,7 +357,7 @@ export default function ProfilePage() {
                   relevance_threshold: Number(e.target.value),
                 })
               }
-              className="accent-[#bac3ff]"
+              className="accent-[rgb(var(--c-primary))]"
             />
           </div>
 
@@ -380,7 +433,7 @@ export default function ProfilePage() {
                           hour: "2-digit",
                           minute: "2-digit",
                         })
-                      : "—"}
+                      : t.profile.neverRun}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -391,7 +444,7 @@ export default function ProfilePage() {
                           hour: "2-digit",
                           minute: "2-digit",
                         })
-                      : "—"}
+                      : t.profile.neverRun}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
