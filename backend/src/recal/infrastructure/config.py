@@ -26,6 +26,9 @@ class Settings(BaseSettings):
 
     persistence_provider: str = "sqlite"
 
+    api_key: str = ""
+    cors_allow_all: bool = False
+
     agent_max_tool_calls: int = 3
     agent_timeout_seconds: int = 60
     relevance_threshold_default: float = 70
