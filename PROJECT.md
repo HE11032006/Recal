@@ -1,4 +1,4 @@
-# Recal — Agent autonome de veille d’opportunités
+# Recal - Agent autonome de veille d’opportunités
 
 ## Vision
 
@@ -103,3 +103,5 @@ Le domaine et les cas d’utilisation doivent être testables sans AWS. Les adap
 6. Déployer le worker avec Lambda et EventBridge.
 7. Connecter le frontend Electron aux routes documentées.
 8. Ajouter observabilité, sécurité, tests d’intégration et préparation de la démonstration.
+
+
