@@ -29,6 +29,7 @@ export default {
           container: "#7287ff",
           fixed: "#dee0ff",
           "fixed-dim": "#bac3ff",
+          vivid: "#8fa0ff",
         },
         "on-primary": {
           DEFAULT: "#001f90",
@@ -76,6 +77,11 @@ export default {
         lg: "0.25rem",
         xl: "0.5rem",
         full: "0.75rem",
+      },
+      boxShadow: {
+        glow: "0 0 24px rgba(114, 135, 255, 0.22)",
+        "glow-sm": "0 0 12px rgba(114, 135, 255, 0.18)",
+        lift: "0 8px 28px rgba(0, 0, 0, 0.55)",
       },
       spacing: {
         gutter: "1rem",
