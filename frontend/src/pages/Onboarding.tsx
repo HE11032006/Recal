@@ -1,6 +1,6 @@
 ﻿import { useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
-import { api, type Profile } from "../api/client";
+import { api, BACKEND_OFFLINE, type Profile } from "../api/client";
 import { useLanguage } from "../i18n/LanguageContext";
 
 const TYPE_META = [
@@ -92,7 +92,11 @@ export default function Onboarding() {
       await new Promise((r) => setTimeout(r, 700));
       navigate("/", { replace: true });
     } catch (e) {
-      setError(e instanceof Error ? e.message : t.onboarding.errUnknown);
+      setError(
+        e instanceof Error && e.message === BACKEND_OFFLINE
+          ? t.common.offlineTitle
+          : (e instanceof Error ? e.message : t.onboarding.errUnknown)
+      );
       setLaunching(false);
     }
   }
@@ -200,7 +204,7 @@ export default function Onboarding() {
                     onClick={() => pickLanguage(lang)}
                     className={`flex items-center justify-center gap-2 rounded py-1.5 font-medium transition-all active:scale-95 ${
                       language === lang
-                        ? "bg-surface-high text-on-surface shadow-sm"
+                        ? "bg-surface-high text-on-surface"
                         : "text-on-surface-variant hover:text-on-surface"
                     }`}
                   >
@@ -413,7 +417,7 @@ export default function Onboarding() {
               </div>
               <div className="flex justify-between">
                 <span className="text-outline">{t.onboarding.recapLevel}</span>
-                <span className="text-on-surface">{studyLevel || "—"}</span>
+                <span className="text-on-surface">{studyLevel || t.onboarding.recapEmpty}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-outline">{t.onboarding.recapFreq}</span>
