@@ -1,24 +1,20 @@
-import { useState, type CSSProperties } from "react";
+﻿import { useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, type Profile } from "../api/client";
+import { useLanguage } from "../i18n/LanguageContext";
 
-const INTERESTS = [
-  "IA",
-  "Web",
-  "Data",
-  "Mobile",
-  "Cybersécurité",
-  "Cloud",
-  "DevOps",
-  "Design",
-  "Blockchain",
-  "Robotique",
-];
-
-const STUDY_LEVELS = ["Licence 1", "Licence 2", "Licence 3", "Master 1", "Master 2", "PhD"];
+const TYPE_META = [
+  { id: "hackathon", icon: "emoji_events" },
+  { id: "internship", icon: "work" },
+  { id: "fellowship", icon: "school" },
+  { id: "scholarship", icon: "payments" },
+  { id: "conference", icon: "groups" },
+  { id: "certification", icon: "workspace_premium" },
+] as const;
 
 export default function Onboarding() {
   const navigate = useNavigate();
+  const { t, setLang } = useLanguage();
   const [step, setStep] = useState(1);
   const [language, setLanguage] = useState<"fr" | "en">("fr");
   const [fullName, setFullName] = useState("");
@@ -41,6 +37,11 @@ export default function Onboarding() {
   const toggle = (list: string[], item: string, setter: (v: string[]) => void) => {
     setter(list.includes(item) ? list.filter((i) => i !== item) : [...list, item]);
   };
+
+  function pickLanguage(lang: "fr" | "en") {
+    setLanguage(lang);
+    setLang(lang);
+  }
 
   async function launch() {
     // Flag posé immédiatement : un rechargement pendant l'analyse ne
@@ -79,8 +80,8 @@ export default function Onboarding() {
         // 409 = cycle déjà en cours ou quota : le cloud prend le relai.
         setError(
           e instanceof Error && e.message.includes("Cycle ignoré")
-            ? `${e.message} — le cycle cloud planifié prend le relai.`
-            : "L'analyse continue en arrière-plan (cloud) — l'agent a déjà été configuré."
+            ? t.onboarding.errSkipped(e.message)
+            : t.onboarding.errBackground
         );
       } finally {
         clearTimeout(timeout);
@@ -91,40 +92,37 @@ export default function Onboarding() {
       await new Promise((r) => setTimeout(r, 700));
       navigate("/", { replace: true });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Erreur inconnue");
+      setError(e instanceof Error ? e.message : t.onboarding.errUnknown);
       setLaunching(false);
     }
   }
 
   if (launching) {
-    const steps = [
-      "Initialisation de l'agent…",
-      "Recherche sur le web en cours…",
-      "Analyse des opportunités avec Claude…",
-      "Calcul des scores de pertinence…",
-      "Premier flux compilé !",
-    ];
+    const steps = t.onboarding.launchSteps;
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-surface px-6 pt-9">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-surface px-6 pt-9">
         <div
-          className="fixed left-0 right-0 top-0 h-9 border-b border-outline-variant/30 bg-surface"
+          className="fixed left-0 right-0 top-0 flex h-9 items-center gap-2 border-b border-outline-variant/30 bg-surface pl-3 pr-32"
           style={{ WebkitAppRegion: "drag" } as CSSProperties}
-        />
-        <div className="flex flex-col gap-space-lg w-full max-w-md">
+        >
+          <img src="app-icon.png" alt="Recal" className="h-5 w-5 rounded-[3px]" draggable={false} />
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline">Recal</span>
+        </div>
+        <div className="animate-fade-in flex flex-col gap-space-lg w-full max-w-md">
           <div className="flex items-center gap-space-sm">
             <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
             <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-              Compilation du premier flux
+              {t.onboarding.compiling}
             </span>
           </div>
           <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
-            L'agent Recal se met au travail.
+            {t.onboarding.working}
           </h1>
           <div className="flex flex-col gap-space-md">
             {steps.map((label, i) => (
-              <div key={label} className="flex items-center gap-space-sm">
+              <div key={label} className="animate-rise flex items-center gap-space-sm" style={{ animationDelay: `${i * 60}ms` }}>
                 <span
-                  className={`flex h-5 w-5 items-center justify-center rounded border ${
+                  className={`flex h-5 w-5 items-center justify-center rounded border transition-all duration-200 ${
                     i < launchStep
                       ? "border-success/50 bg-success/15 text-success"
                       : i === launchStep
@@ -137,7 +135,7 @@ export default function Onboarding() {
                   </span>
                 </span>
                 <span
-                  className={`text-body-md ${
+                  className={`text-body-md transition-colors ${
                     i <= launchStep ? "text-on-surface" : "text-outline"
                   }`}
                 >
@@ -147,8 +145,8 @@ export default function Onboarding() {
             ))}
           </div>
           {error && (
-            <div className="border border-error/40 bg-error-container/30 rounded p-space-md text-body-sm text-error">
-              {error} — le cycle cloud prendra le relai.
+            <div className="animate-fade-in border border-error/40 bg-error-container/30 rounded p-space-md text-body-sm text-error">
+              {error}
             </div>
           )}
         </div>
@@ -156,12 +154,21 @@ export default function Onboarding() {
     );
   }
 
+  const freqOptions = [
+    { value: 60, label: t.onboarding.freqHourly, tag: t.onboarding.freqHourlyTag },
+    { value: 180, label: t.onboarding.freq3h, tag: t.onboarding.freq3hTag },
+    { value: 720, label: t.onboarding.freq2x, tag: t.onboarding.freq2xTag },
+  ];
+
   return (
     <div className="flex min-h-screen flex-col bg-surface pt-9">
       <div
-        className="fixed left-0 right-0 top-0 h-9 border-b border-outline-variant/30 bg-surface"
+        className="fixed left-0 right-0 top-0 flex h-9 items-center gap-2 border-b border-outline-variant/30 bg-surface pl-3 pr-32"
         style={{ WebkitAppRegion: "drag" } as CSSProperties}
-      />
+      >
+        <img src="app-icon.png" alt="Recal" className="h-5 w-5 rounded-[3px]" draggable={false} />
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline">Recal</span>
+      </div>
       <div className="h-1 w-full bg-surface-lowest">
         <div
           className="h-full bg-primary transition-all duration-500"
@@ -169,29 +176,29 @@ export default function Onboarding() {
         />
       </div>
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center px-6 py-space-xl">
-        {step === 1 && (
+        <div key={step} className="animate-rise flex flex-col gap-space-lg">
+          {step === 1 && (
           <div className="flex flex-col gap-space-lg">
             <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
-              Étape 1 sur 4 · Bienvenue
+              {t.onboarding.stepOf(1)} · {t.onboarding.s1kicker}
             </span>
             <h1 className="text-3xl font-semibold tracking-tight text-on-surface">
-              Ton agent de veille personnel.
+              {t.onboarding.s1title}
             </h1>
             <p className="text-body-lg leading-relaxed text-on-surface-variant">
-              Recal scrute le web, filtre les opportunités étudiantes (hackathons, bourses,
-              fellowships, stages) et élimine le bruit grâce à Claude.
+              {t.onboarding.s1desc}
             </p>
             <div className="flex flex-col gap-space-xs">
               <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                Langue
+                {t.onboarding.language}
               </span>
               <div className="grid grid-cols-2 gap-1 rounded border border-outline-variant/40 bg-surface-lowest p-1">
                 {(["fr", "en"] as const).map((lang) => (
                   <button
                     key={lang}
                     type="button"
-                    onClick={() => setLanguage(lang)}
-                    className={`flex items-center justify-center gap-2 rounded py-1.5 font-medium transition-all ${
+                    onClick={() => pickLanguage(lang)}
+                    className={`flex items-center justify-center gap-2 rounded py-1.5 font-medium transition-all active:scale-95 ${
                       language === lang
                         ? "bg-surface-high text-on-surface shadow-sm"
                         : "text-on-surface-variant hover:text-on-surface"
@@ -205,22 +212,22 @@ export default function Onboarding() {
             </div>
             <div className="flex flex-col gap-space-xs">
               <span className="flex items-center justify-between font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                Identité
-                <span className="text-primary">REQUIS</span>
+                {t.onboarding.identity}
+                <span className="text-primary">{t.onboarding.required}</span>
               </span>
               <input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="ex. Alexandre Laurent"
+                placeholder={t.onboarding.namePlaceholder}
                 className="h-11 rounded border-none bg-surface-lowest px-3.5 text-on-surface placeholder:text-outline focus:bg-surface-low focus:outline-none"
               />
             </div>
             <button
               onClick={() => fullName.trim() && setStep(2)}
               disabled={!fullName.trim()}
-              className="h-12 rounded bg-primary font-medium text-on-primary transition-all hover:bg-primary-fixed disabled:opacity-40"
+              className="h-12 rounded bg-primary font-medium text-on-primary transition-all duration-150 hover:bg-primary-fixed hover:shadow-glow active:scale-[0.99] disabled:opacity-40"
             >
-              Commencer la configuration
+              {t.onboarding.start}
             </button>
           </div>
         )}
@@ -228,22 +235,22 @@ export default function Onboarding() {
         {step === 2 && (
           <div className="flex flex-col gap-space-lg">
             <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
-              Étape 2 sur 4 · Profil académique
+              {t.onboarding.stepOf(2)} · {t.onboarding.s2kicker}
             </span>
             <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
-              Calibre le radar de l'agent.
+              {t.onboarding.s2title}
             </h1>
             <div className="flex flex-col gap-space-xs">
               <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                Centres d'intérêt
+                {t.onboarding.interests}
               </span>
               <div className="flex flex-wrap gap-1.5">
-                {INTERESTS.map((interest) => (
+                {t.onboarding.interestOptions.map((interest) => (
                   <button
                     key={interest}
                     type="button"
                     onClick={() => toggle(interests, interest, setInterests)}
-                    className={`rounded border px-2.5 py-1 font-mono text-label-sm transition-colors ${
+                    className={`rounded border px-2.5 py-1 font-mono text-label-sm transition-all active:scale-95 ${
                       interests.includes(interest)
                         ? "border-primary/60 bg-primary/15 text-primary"
                         : "border-outline-variant/40 bg-surface-lowest text-on-surface-variant hover:text-on-surface"
@@ -256,15 +263,15 @@ export default function Onboarding() {
             </div>
             <div className="flex flex-col gap-space-xs">
               <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                Niveau d'études
+                {t.onboarding.studyLevel}
               </span>
               <select
                 value={studyLevel}
                 onChange={(e) => setStudyLevel(e.target.value)}
                 className="h-11 rounded border-none bg-surface-lowest px-3 text-on-surface focus:outline-none"
               >
-                <option value="">Sélectionner…</option>
-                {STUDY_LEVELS.map((level) => (
+                <option value="">{t.onboarding.selectPlaceholder}</option>
+                {t.onboarding.studyOptions.map((level) => (
                   <option key={level} value={level}>
                     {level}
                   </option>
@@ -273,28 +280,28 @@ export default function Onboarding() {
             </div>
             <div className="flex flex-col gap-space-xs">
               <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                Pays de rattachement
+                {t.onboarding.country}
               </span>
               <input
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
-                placeholder="ex. Côte d'Ivoire"
+                placeholder={t.onboarding.countryPlaceholder}
                 className="h-11 rounded border-none bg-surface-lowest px-3.5 text-on-surface placeholder:text-outline focus:outline-none"
               />
             </div>
             <div className="flex gap-space-sm">
               <button
                 onClick={() => setStep(1)}
-                className="h-12 rounded border border-outline-variant/50 px-4 text-on-surface-variant hover:text-on-surface"
+                className="h-12 rounded border border-outline-variant/50 px-4 text-on-surface-variant transition-all hover:text-on-surface active:scale-95"
               >
-                Retour
+                {t.onboarding.back}
               </button>
               <button
                 onClick={() => interests.length && setStep(3)}
                 disabled={!interests.length}
-                className="h-12 flex-1 rounded bg-primary font-medium text-on-primary transition-all hover:bg-primary-fixed disabled:opacity-40"
+                className="h-12 flex-1 rounded bg-primary font-medium text-on-primary transition-all duration-150 hover:bg-primary-fixed hover:shadow-glow active:scale-[0.99] disabled:opacity-40"
               >
-                Continuer
+                {t.onboarding.continue}
               </button>
             </div>
           </div>
@@ -303,26 +310,22 @@ export default function Onboarding() {
         {step === 3 && (
           <div className="flex flex-col gap-space-lg">
             <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
-              Étape 3 sur 4 · Paramètres de veille
+              {t.onboarding.stepOf(3)} · {t.onboarding.s3kicker}
             </span>
             <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
-              Définis le rythme d'analyse.
+              {t.onboarding.s3title}
             </h1>
             <div className="flex flex-col gap-space-xs">
               <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                Fréquence des cycles
+                {t.onboarding.frequency}
               </span>
               <div className="grid grid-cols-3 gap-2">
-                {[
-                  { value: 60, label: "Toutes les heures", tag: "RECOMMANDÉ" },
-                  { value: 180, label: "Toutes les 3 heures", tag: "ÉCONOME" },
-                  { value: 720, label: "2 fois par jour", tag: "DISCRET" },
-                ].map((option) => (
+                {freqOptions.map((option) => (
                   <button
                     key={option.value}
                     type="button"
                     onClick={() => setFrequency(option.value)}
-                    className={`flex flex-col gap-1 rounded border p-space-md text-left transition-colors ${
+                    className={`flex flex-col gap-1 rounded border p-space-md text-left transition-all active:scale-[0.98] ${
                       frequency === option.value
                         ? "border-primary/60 bg-primary/10"
                         : "border-outline-variant/40 bg-surface-lowest hover:border-outline-variant/70"
@@ -336,41 +339,34 @@ export default function Onboarding() {
             </div>
             <div className="flex flex-col gap-space-xs">
               <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                Types d'opportunités
+                {t.onboarding.watchTypes}
               </span>
               <div className="grid grid-cols-2 gap-2">
-                {[
-                  { id: "hackathon", label: "Hackathons", icon: "emoji_events" },
-                  { id: "internship", label: "Stages & Jobs", icon: "work" },
-                  { id: "fellowship", label: "Fellowships", icon: "school" },
-                  { id: "scholarship", label: "Bourses", icon: "payments" },
-                  { id: "conference", label: "Conférences", icon: "groups" },
-                  { id: "certification", label: "Certifications", icon: "workspace_premium" },
-                ].map((t) => (
+                {TYPE_META.map((meta) => (
                   <button
-                    key={t.id}
+                    key={meta.id}
                     type="button"
-                    onClick={() => toggle(types, t.id, setTypes)}
-                    className={`flex items-center justify-between rounded border p-space-md transition-colors ${
-                      types.includes(t.id)
+                    onClick={() => toggle(types, meta.id, setTypes)}
+                    className={`flex items-center justify-between rounded border p-space-md transition-all active:scale-[0.98] ${
+                      types.includes(meta.id)
                         ? "border-primary/60 bg-primary/10"
                         : "border-outline-variant/40 bg-surface-lowest"
                     }`}
                   >
                     <span className="flex items-center gap-space-sm text-body-md text-on-surface">
                       <span className="material-symbols-outlined text-[18px] text-outline">
-                        {t.icon}
+                        {meta.icon}
                       </span>
-                      {t.label}
+                      {t.types[meta.id as keyof typeof t.types]}
                     </span>
                     <span
                       className={`h-4 w-4 rounded-sm border ${
-                        types.includes(t.id)
+                        types.includes(meta.id)
                           ? "border-primary bg-primary"
                           : "border-outline-variant"
                       }`}
                     >
-                      {types.includes(t.id) && (
+                      {types.includes(meta.id) && (
                         <span className="material-symbols-outlined text-[12px] text-on-primary">
                           check
                         </span>
@@ -383,16 +379,16 @@ export default function Onboarding() {
             <div className="flex gap-space-sm">
               <button
                 onClick={() => setStep(2)}
-                className="h-12 rounded border border-outline-variant/50 px-4 text-on-surface-variant hover:text-on-surface"
+                className="h-12 rounded border border-outline-variant/50 px-4 text-on-surface-variant transition-all hover:text-on-surface active:scale-95"
               >
-                Retour
+                {t.onboarding.back}
               </button>
               <button
                 onClick={() => types.length && setStep(4)}
                 disabled={!types.length}
-                className="h-12 flex-1 rounded bg-primary font-medium text-on-primary transition-all hover:bg-primary-fixed disabled:opacity-40"
+                className="h-12 flex-1 rounded bg-primary font-medium text-on-primary transition-all duration-150 hover:bg-primary-fixed hover:shadow-glow active:scale-[0.99] disabled:opacity-40"
               >
-                Prêt pour compilation
+                {t.onboarding.ready}
               </button>
             </div>
           </div>
@@ -401,50 +397,52 @@ export default function Onboarding() {
         {step === 4 && (
           <div className="flex flex-col gap-space-lg">
             <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
-              Étape 4 sur 4 · Récapitulatif
+              {t.onboarding.stepOf(4)} · {t.onboarding.s4kicker}
             </span>
             <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
-              Configuration vérifiée.
+              {t.onboarding.s4title}
             </h1>
             <div className="flex flex-col gap-2 rounded border border-outline-variant/40 bg-surface-lowest p-space-md font-mono text-label-sm">
               <div className="flex justify-between">
-                <span className="text-outline">AGENT</span>
+                <span className="text-outline">{t.onboarding.recapAgent}</span>
                 <span className="text-on-surface">{fullName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-outline">INTÉRÊTS</span>
+                <span className="text-outline">{t.onboarding.recapInterests}</span>
                 <span className="text-on-surface">{interests.join(", ")}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-outline">NIVEAU</span>
+                <span className="text-outline">{t.onboarding.recapLevel}</span>
                 <span className="text-on-surface">{studyLevel || "—"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-outline">FRÉQUENCE</span>
-                <span className="text-on-surface">{frequency} min</span>
+                <span className="text-outline">{t.onboarding.recapFreq}</span>
+                <span className="text-on-surface">{frequency} {t.onboarding.minUnit}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-outline">TYPES</span>
+                <span className="text-outline">{t.onboarding.recapTypes}</span>
                 <span className="text-on-surface">{types.join(", ")}</span>
               </div>
             </div>
             <div className="flex gap-space-sm">
               <button
                 onClick={() => setStep(3)}
-                className="h-12 rounded border border-outline-variant/50 px-4 text-on-surface-variant hover:text-on-surface"
+                className="h-12 rounded border border-outline-variant/50 px-4 text-on-surface-variant transition-all hover:text-on-surface active:scale-95"
               >
-                Retour
+                {t.onboarding.back}
               </button>
               <button
                 onClick={launch}
-                className="h-12 flex-1 rounded bg-primary font-medium text-on-primary transition-all hover:bg-primary-fixed"
+                className="h-12 flex-1 rounded bg-primary font-medium text-on-primary transition-all duration-150 hover:bg-primary-fixed hover:shadow-glow active:scale-[0.99]"
               >
-                Lancer l'agent
+                {t.onboarding.launch}
               </button>
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
 }
+
