@@ -40,12 +40,12 @@ function createWindow() {
     height: 900,
     minWidth: 1024,
     minHeight: 700,
-    backgroundColor: "#111317",
+    backgroundColor: "#f6f6f6",
     icon: nativeImage.createFromPath(APP_ICON),
     titleBarStyle: "hidden",
     titleBarOverlay: {
-      color: "#111317",
-      symbolColor: "#e2e2e6",
+      color: "#f6f6f6",
+      symbolColor: "#141414",
       height: 36,
     },
     autoHideMenuBar: true,
@@ -152,6 +152,21 @@ function ipcHandlers() {
           : "Recal — agent de veille actif"
       );
       return true;
+    }
+    return false;
+  });
+  ipcMain.handle("recal:theme", (_event, { theme }) => {
+    // Synchronise les contrôles natifs (titlebar overlay) avec le thème web.
+    if (mainWindow && (theme === "light" || theme === "dark")) {
+      const overlay = theme === "dark"
+        ? { color: "#111317", symbolColor: "#e2e2e6", height: 36 }
+        : { color: "#f6f6f6", symbolColor: "#141414", height: 36 };
+      try {
+        mainWindow.setTitleBarOverlay(overlay);
+        return true;
+      } catch {
+        return false;
+      }
     }
     return false;
   });
