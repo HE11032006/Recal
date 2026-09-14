@@ -1,0 +1,6 @@
+boto3
+httpx
+pydantic
+pydantic-settings
+python-dotenv
+strands-agents
