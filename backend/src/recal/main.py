@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from datetime import datetime
 from typing import Annotated
 from uuid import uuid4
 
@@ -10,7 +11,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from recal.application.use_cases import ResourceNotFoundError
-from recal.domain.entities import Feedback, UserProfile
+from recal.domain.entities import Feedback, UserProfile, WatchSettings
+from recal.domain.errors import WatchSkippedError
 from recal.infrastructure.dependencies import AppContainer, build_container
 from recal.infrastructure.observability import configure_logging, init_sentry
 from recal.infrastructure.rate_limit import InMemoryRateLimiter
@@ -23,6 +25,7 @@ from recal.interfaces.api_schemas import (
     RunResponse,
     UserProfileResponse,
     UserProfileUpdate,
+    WatchStateResponse,
 )
 
 app = FastAPI(
@@ -41,7 +44,14 @@ _run_rate_limiter = InMemoryRateLimiter(max_requests=5, window_seconds=60)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost", "http://127.0.0.1"],
+    allow_origins=[
+        "http://localhost",
+        "http://127.0.0.1",
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+    ],
     allow_credentials=False,
     allow_methods=["GET", "POST", "PUT"],
     allow_headers=["Content-Type", "Authorization", "X-Request-ID"],
@@ -94,6 +104,25 @@ async def health() -> HealthResponse:
     return HealthResponse()
 
 
+@app.get("/api/v1/watch", response_model=WatchStateResponse, tags=["Watch"])
+async def get_watch_state(
+    container: Annotated[AppContainer, Depends(get_container)],
+) -> WatchStateResponse:
+    """État de veille de l’agent : cycles, planification, quota."""
+    profile = await container.profiles.get_default()
+    state = await container.watch_state.get()
+    return WatchStateResponse(
+        last_run_at=state.last_run_at,
+        next_run_at=state.next_run_at,
+        last_successful_run_at=state.last_successful_run_at,
+        runs_today=state.runs_today,
+        daily_max_runs=profile.watch.daily_max_runs,
+        processed_urls_count=len(state.processed_urls),
+        enabled=profile.watch.enabled,
+        frequency_minutes=profile.watch.frequency_minutes,
+    )
+
+
 @app.get("/api/v1/profile", response_model=UserProfileResponse, tags=["Profile"])
 async def get_profile(
     container: Annotated[AppContainer, Depends(get_container)],
@@ -107,9 +136,9 @@ async def update_profile(
     payload: UserProfileUpdate,
     container: Annotated[AppContainer, Depends(get_container)],
 ) -> UserProfileResponse:
-    profile = await container.update_profile.execute(
-        UserProfile(id="default", **payload.model_dump())
-    )
+    data = payload.model_dump()
+    data["watch"] = WatchSettings(**data["watch"])
+    profile = await container.update_profile.execute(UserProfile(id="default", **data))
     return UserProfileResponse(**asdict(profile))
 
 
@@ -119,13 +148,23 @@ async def list_opportunities(
     page_size: Annotated[int, Query(ge=1, le=100)] = 20,
     min_score: Annotated[float | None, Query(ge=0, le=100)] = None,
     opportunity_status: Annotated[str | None, Query(alias="status")] = None,
+    since: Annotated[str | None, Query(description="ISO 8601 : opportunités vérifiées après cette date")] = None,
     container: AppContainer = Depends(get_container),
 ) -> OpportunityPageResponse:
+    since_dt: datetime | None = None
+    if since:
+        try:
+            since_dt = datetime.fromisoformat(since.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=422, detail="Paramètre 'since' invalide : date ISO 8601 attendue"
+            ) from exc
     items, total = await container.list_opportunities.execute(
         page=page,
         page_size=page_size,
         min_score=min_score,
         status=opportunity_status,
+        since=since_dt,
     )
     return OpportunityPageResponse(
         items=[OpportunityResponse.model_validate(item) for item in items],
@@ -198,7 +237,17 @@ async def create_run(
         )
         response.headers["Retry-After"] = str(decision.retry_after_seconds)
         return response
-    run = await container.start_watch_run.execute()
+    try:
+        run = await container.start_watch_run.execute()
+    except WatchSkippedError as exc:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Cycle ignoré : {exc.reason}",
+        ) from exc
+    return _run_response(run)
+
+
+def _run_response(run) -> RunResponse:
     return RunResponse(
         id=run.id,
         trigger=run.trigger,
@@ -207,6 +256,7 @@ async def create_run(
         completed_at=run.completed_at,
         opportunities_found=run.opportunities_found,
         error_message=run.error_message,
+        urls_processed=run.urls_processed,
     )
 
 
@@ -218,12 +268,4 @@ async def get_run(
     run = await container.runs.get(run_id)
     if run is None:
         raise HTTPException(status_code=404, detail="Cycle introuvable")
-    return RunResponse(
-        id=run.id,
-        trigger=run.trigger,
-        status=run.status,
-        created_at=run.created_at,
-        completed_at=run.completed_at,
-        opportunities_found=run.opportunities_found,
-        error_message=run.error_message,
-    )
+    return _run_response(run)
