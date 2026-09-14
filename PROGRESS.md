@@ -110,3 +110,15 @@ Stack React + Vite + Tailwind, palette Stitch (Inter + JetBrains Mono, dark). 5 
 ### Catalogue enrichi (sources Perplexity, profil Bénin)
 
 Intégration de ~50 nouvelles sources par catégorie : hackathons (hackathon.com, devfolio.co, zindi.africa, kaggle.com, ethglobal.com, hackathons.space), stages (glassdoor.com, wellfound.com, relocate.me, remoteok.com, weworkremotely.com, careers.un.org, app.unv.org, euraxess), fellowships (GSoC, outreachy.org, LFX, profellow.com, africanleadershipacademy.org), bourses (campusfrance.org, Erasmus Mundus, educanada.ca, Commonwealth, scholarshippositions.com, wemakescholars.com, findamasters.com, studyportals.com), conférences (10times.com, eventbrite.com, meetup.com, lu.ma, IEEE, ACM, pydata.org, owasp.org, africatechsummit.com), certifications (netacad.com, grow.google, skillsbuild.org, skillbuilder.aws, cisco.com, fortinet, isc2.org, linuxfoundation.org). Agrégateurs tout-en-un (youthop.com, opportunitydesk.org, polenexus.com, etc.) toujours inclus via SHARED_AGGREGATORS. Requêtes conference/certification ajoutées. 40 tests verts.
+
+### Relooking dark modernisé + interactions instantanées
+
+Motion system CSS (fade-in, rise en cascade, scale-in, shimmer, glass, respect prefers-reduced-motion). Accent vivid `#8fa0ff` + ombres glow sur hover. Cartes : lift + glow au survol, press au clic. UI optimiste : Sauver/Passer appliqués instantanément avec rollback si l'API échoue (Today + Saved). Modal détail en glass + blur + scale-in. Skeletons shimmer au lieu de pulse brut. Fondu à chaque navigation. Boutons primary avec glow + press. Étapes onboarding animées.
+
+### i18n FR/EN complet
+
+Dictionnaires typés (`src/i18n/dictionaries.ts`), `LanguageProvider` + hook `useLanguage`, persistance `recal:lang`, attribut `lang` HTML synchronisé. Tout l'UI converti : nav, onboarding (toggle live + options traduites), Today (onglets, modal, dates localisées), Saved, Profil (synchro bidirectionnelle avec `profile.language` backend). Notifications toasts traduites. Build vert.
+
+### API cloud pour le jury (Lambda Function URL + clé API)
+
+`recal-api-dev` : FastAPI exposée via Mangum sur Function URL publique (AuthType NONE, protection par middleware `x-api-key` actif uniquement si `API_KEY` configurée). Paramètre SAM `ApiKey` (NoEcho). CORS ouvert via `CORS_ALLOW_ALL` pour l'Electron packagé (origin file://). Sécurité : clé jamais loggée/committée, rate-limit 429 + quota quotidien DynamoDB comme remparts coûts, Bedrock limité au modèle exact. Frontend : header `x-api-key` depuis `VITE_API_KEY` (absent en dev = pas de header), erreur 401 explicite. 6 tests `test_api_auth.py` (ouvert/fermé/mauvaise clé/health/preflight). 46 tests verts.
