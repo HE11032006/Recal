@@ -2,9 +2,25 @@
 
 ## Statut global
 
-**Phase actuelle :** initialisation de l’architecture backend et des contrats frontend/backend.
+**Phase actuelle :** MVP cloud opérationnel. L’agent veille seul dans AWS (étape 6 terminée) ; prochaine phase : frontend Electron et notifications.
 
-**État :** structure du dépôt, documentation de vision, contrat OpenAPI et socle FastAPI initial créés.
+**État :** worker Lambda `recal-worker-dev` déployé et validé en conditions réelles (cycle complet : Parallel Search → Claude Haiku 4.5 → scoring → déduplication → 3 opportunités persistées en DynamoDB). Réveil EventBridge `recal-watch-dev` chaque heure, DLQ SQS, IAM least-privilege (rôle Lambda limité au modèle Haiku 4.5 exact, multi-régions US pour l’inference profile). Infrastructure complète décrite dans `infra/template.yaml` (SAM), déployable en 2 commandes. Pipeline CI DevSecOps, tests (34), Ruff, Mypy.
+
+## Validation AWS
+
+Compte `039892245550`, utilisateur IAM `recal_dev`, région `us-east-1`. Modèle `us.anthropic.claude-haiku-4-5-20251001-v1:0` actif. Bedrock validé en réel (local et cloud). Policy de déploiement `recal-deploy-policy` (fichier `infra/recal-deploy-policy.json`) : attachée à `recal_dev`, couvre CloudFormation/S3/IAM/Lambda/DynamoDB/Scheduler/SQS/Logs, tout scopé `recal-*`.
+
+## Déploiement cloud
+
+| Ressource | Nom | Rôle |
+|---|---|---|
+| Stack CloudFormation | `recal-dev` | Déploiement tout-en-un via SAM. |
+| Lambda | `recal-worker-dev` | Cycle de veille complet (timeout 600 s). |
+| EventBridge Scheduler | `recal-watch-dev` | Réveil `rate(1 hour)`, fenêtre flexible 5 min, retry 1, DLQ. |
+| DynamoDB | `recal-opportunities-dev`, `recal-profiles-dev`, `recal-runs-dev`, `recal-watch-state-dev` | Persistance cloud (PITR activé sur opportunités). |
+| SQS | `recal-worker-dlq-dev` | Cycles en échec, rétention 14 jours. |
+
+Procédure : `sam build --use-container --template infra/template.yaml` puis `sam deploy --stack-name recal-dev --resolve-s3 --capabilities CAPABILITY_IAM`. Build Docker obligatoire (pywin32 bloque la résolution pip sous Windows via la dépendance `mcp`).
 
 ## Terminé
 
@@ -17,31 +33,39 @@
 | Architecture backend | Défini | Architecture hexagonale inspirée de Clean Architecture. |
 | Document de vision | Terminé | Voir `PROJECT.md`. |
 | Contrat initial des routes | Défini | Routes versionnées sous `/api/v1`, à formaliser dans OpenAPI. |
+| Configuration de veille | Terminé | `WatchSettings` (enabled, frequency_minutes, allowed_domains, opportunity_types, minimum_relevance_score, daily_max_runs, quotas) exposée via `PUT /api/v1/profile`. |
+| État de veille | Terminé | `WatchState` (last_run_at, next_run_at, last_successful_run_at, compteur quotidien, URLs traitées) persisté dans SQLite via `SQLiteWatchStateRepository`. |
+| Domaines autorisés | Terminé | Catalogue par défaut par type (`domain/catalog.py`) : liste vide = catalogue, liste explicite = filtrage strict par suffixe de domaine. |
+| Recherche web réelle | Terminé | `ParallelSearchAdapter` (MCP JSON-RPC, `https://search.parallel.ai/mcp`) : gratuit, sans clé, testé en conditions réelles. Tavily conservé en fallback optionnel. |
+| Cycle local complet | Terminé | Recherche Parallel réelle + filtrage domaines + dédup URLs + Claude Haiku 4.5 + persistance SQLite : `scripts/local_cycle.py`. Validé via container `.env` (Parallel + Strands). |
+| Analyseur Claude | Terminé | `StrandsOpportunityAnalyzer` branché : `ANALYZER_PROVIDER=strands` dans `.env`. Cycle réel persiste opportunités avec deadline, organisation, raisons de pertinence. |
+| Garde-fous worker | Terminé | Cycle scheduled vérifie : veille activée, pas de cycle actif (queued/running), fréquence respectée, quota quotidien. Skip sans erreur Lambda (`WatchSkippedError`). |
+| Persistance DynamoDB | Terminé | Adaptateurs complets (profils avec watch, runs avec URLs, état, verrous `get_active`). Scores convertis en `Decimal` pour boto3. |
+| Worker Lambda | Terminé | `recal-worker-dev` déployé, cycle réel validé : 3 opportunités persistées (dont HackMIT 2026, score 80.25). |
+| EventBridge Scheduler | Terminé | `recal-watch-dev` : réveil horaire, fenêtre flexible, retry, DLQ SQS avec policy autorisant `scheduler.amazonaws.com`. |
+| Infrastructure as Code | Terminé | `infra/template.yaml` (SAM) : tables, Lambda, schedule, DLQ, IAM least-privilege (Bedrock limité au modèle exact). |
 
 ## En cours
 
 | Élément | Statut | Prochaine action |
 |---|---|---|
 | Structure physique du dépôt | Terminé | Dossiers backend, contrats, infrastructure et scripts créés. |
-| Contrat OpenAPI | Terminé | `contracts/openapi.yaml` créé avec les routes versionnées et les schémas principaux. |
-| Socle FastAPI | En cours | Application FastAPI, documentation interactive et `/api/v1/health` créés ; tests à ajouter. |
-| Domaine métier | En cours | Entités et ports applicatifs initiaux créés ; cas d’usage et adaptateurs à compléter. |
+| Contrat OpenAPI | Terminé | `contracts/openapi.yaml` créé avec les routes versionnées et les schémas principaux. À mettre à jour avec `watch` et `urls_processed`. |
+| Socle FastAPI | Terminé | Routes reliées aux cas d’usage, validation Pydantic, erreurs uniformes, identifiant de requête, headers de sécurité et CORS ajoutés. Les cycles exposent leur origine `manual` ou `scheduled`. |
+| Domaine métier | Terminé | Entités, ports, cas d’usage, runner applicatif et adaptateurs mémoire créés. |
 
-## Non commencé
+## À faire et intégrations restantes
 
 | Élément | Dépendance |
 |---|---|
-| Agent Strands | Socle backend et configuration Bedrock. |
-| Intégration Tavily | Variable d’environnement et adaptateur de recherche. |
-| Scoring explicable | Entités et cas d’utilisation stabilisés. |
-| Déduplication | Modèle d’opportunité et persistance définis. |
-| DynamoDB | Schéma de persistance et clés d’idempotence. |
-| Lambda worker | Pipeline applicatif fonctionnel localement. |
-| EventBridge Scheduler | Worker déployable et permissions IAM. |
+| Stabilité recherche | Les résultats Parallel varient ; certains cycles ramènent des pages de listing rejetées par l’analyseur (comportement correct). Pistes : augmenter `max_queries_per_run`, affiner les requêtes, ajouter des domaines au catalogue. |
+| TTL DynamoDB | Terminé : champ `ttl` calculé par cycle (`deadline` + 30 jours, sinon `verified_at` + 90 jours), `TimeToLiveSpecification` active sur `recal-opportunities-dev`. |
+| API cloud | L’API FastAPI tourne en local ; le frontend Electron devra consommer soit cette API locale, soit une API hébergée. Décision d’architecture à prendre. |
 | Frontend Electron | Contrat OpenAPI disponible et routes testées. |
 | Notifications natives | Intégration frontend et endpoint de nouvelles opportunités. |
-| Tests d’intégration AWS | Services cloud accessibles dans `us-east-1`. |
-| Documentation de déploiement | Infrastructure et variables d’environnement stabilisées. |
+| Catalogue domaines | Liste initiale générique en place ; à affiner avec les domaines réellement observés et vérifiés. |
+| Tests d’intégration AWS | Cycle cloud validé manuellement (invoke + scan DynamoDB). Automatiser en CI plus tard. Les contrôles locaux passent : 34 tests, Ruff, formatage et Mypy. |
+| Documentation de déploiement | Procédure SAM documentée (build + deploy). Variables Sentry, contrôles Secure List, registre `SECURITY.md`, workflow CI documentés. |
 | Vidéo et démonstration | MVP complet et reproductible. |
 
 ## Décisions importantes
@@ -51,13 +75,38 @@
 3. Le backend reste l’unique propriétaire du scoring, de la déduplication et des règles métier.
 4. Les routes seront versionnées et documentées avant l’intégration du frontend.
 5. AgentCore reste une option ultérieure et ne doit pas bloquer le MVP.
+6. Parallel Search MCP est le provider de recherche par défaut : gratuit, sans clé, validé en conditions réelles. Tavily reste disponible en fallback (`SEARCH_PROVIDER=tavily`).
+7. L’analyseur par défaut est l’heuristique locale (`ANALYZER_PROVIDER=fake`) pour valider le pipeline sans AWS ; Strands/Claude sera activé par simple changement de variable.
+8. Un cycle planifié ignoré (fréquence, quota, verrou, veille désactivée) est un comportement normal : le worker renvoie `skipped` sans faire échouer le scheduler.
+9. Le build SAM sous Windows exige `--use-container` (pywin32, dépendance de `mcp`, casse la résolution pip native). Le CodeUri pointe vers `backend/src` contenant son propre `requirements.txt`.
+10. Bedrock via inference profile US route dynamiquement entre régions : la policy du rôle Lambda couvre `bedrock:*` (toutes régions) mais uniquement le modèle `anthropic.claude-haiku-4-5-20251001-v1:0` exact.
+11. Les nombres DynamoDB exigent `Decimal` (boto3 refuse les floats) : conversion via `_to_decimal` à la sérialisation.
 
 ## Critères de sortie de la prochaine étape
 
-La prochaine étape sera considérée comme terminée lorsque le dépôt contiendra la structure backend, `contracts/openapi.yaml`, une API FastAPI démarrable, la route `/api/v1/health`, les modèles de requêtes/réponses principaux et des tests unitaires de base.
+Frontend Electron connecté au backend : affichage des opportunités filtrées, notification des nouvelles opportunités, gestion du profil. Préalable : décider où héberger l’API consommée par Electron.
 
 ## Journal
 
 ### Initialisation
 
 Le projet Recal était vide. Les décisions d’architecture et les responsabilités des couches ont été documentées avant l’implémentation afin de permettre au frontend de consommer un contrat stable.
+
+### Veille locale
+
+Ajout de la configuration et de l’état de veille (garde-fous, quota, URLs traitées), du catalogue de domaines autorisés, de l’adaptateur Parallel Search MCP, du filtrage et de la déduplication dans le runner, des dépôts SQLite correspondants et de l’analyseur heuristique local. Cycle complet validé en conditions réelles : recherche Parallel, opportunités persistées ; second appel scheduled correctement ignoré (`frequency_not_respected`).
+
+### Claude Haiku 4.5 (validation AWS)
+
+Compte et permissions Bedrock validés (modèle actif, invocation testée). Requêtes du runner réorientées vers des pages d’événements plutôt que des agrégateurs. Correctif de pagination SQLite (LIMIT/OFFSET inversés) découvert grâce au cycle réel. `ANALYZER_PROVIDER=strands` activé : cycle complet container persiste des opportunités réelles avec scores, deadlines et raisons.
+
+### Déploiement cloud (étape 6)
+Infrastructure as Code SAM (`infra/template.yaml`) : 4 tables DynamoDB, Lambda worker, EventBridge Scheduler horaire avec DLQ SQS, IAM least-privilege. Déploiement réel après itérations IAM (policy `recal-deploy-policy` affinée action par action : CreateChangeSet sur transform SAM, tags S3, DetachRolePolicy, PassRole vers scheduler, GetTemplateSummary) et correctifs template (`FLEXIBLE` majuscule, CodeUri). Bugs runtime corrigés grâce aux invocations réelles : dépendances manquantes (build sans container), `Decimal` exigé par boto3, permissions Bedrock multi-régions. Validation finale : cycle cloud complet persiste 3 opportunités réelles (dont HackMIT 2026, score 80.25) dans `recal-opportunities-dev`.
+
+### Frontend Electron (phase 2)
+
+Stack React + Vite + Tailwind, palette Stitch (Inter + JetBrains Mono, dark). 5 pages : onboarding 4 étapes (langue FR/EN, profil, veille, lancement narratif), Aujourd'hui (grille + modal détail), Sauvegardés (onglets statut + tri), Profil (identité, veille, domaines, état agent live). API consommée en sidecar local → DynamoDB partagé avec le worker cloud. Tray système (fermeture = veille en arrière-plan), splash avec spinner, titlebar overlay. Fix environnementaux : CORS pour localhost:5173/5174, quota quotidien réservé aux cycles planifiés (manuels jamais bloqués), filtre `since` pour nouveautés, notifications automatiques + badge tray via polling 60 s. Fix Electron : path.txt en UTF-16 corrompu (écrire en UTF-8), extraction manuelle du binaire via miroir npmmirror.
+
+### Catalogue enrichi (sources Perplexity, profil Bénin)
+
+Intégration de ~50 nouvelles sources par catégorie : hackathons (hackathon.com, devfolio.co, zindi.africa, kaggle.com, ethglobal.com, hackathons.space), stages (glassdoor.com, wellfound.com, relocate.me, remoteok.com, weworkremotely.com, careers.un.org, app.unv.org, euraxess), fellowships (GSoC, outreachy.org, LFX, profellow.com, africanleadershipacademy.org), bourses (campusfrance.org, Erasmus Mundus, educanada.ca, Commonwealth, scholarshippositions.com, wemakescholars.com, findamasters.com, studyportals.com), conférences (10times.com, eventbrite.com, meetup.com, lu.ma, IEEE, ACM, pydata.org, owasp.org, africatechsummit.com), certifications (netacad.com, grow.google, skillsbuild.org, skillbuilder.aws, cisco.com, fortinet, isc2.org, linuxfoundation.org). Agrégateurs tout-en-un (youthop.com, opportunitydesk.org, polenexus.com, etc.) toujours inclus via SHARED_AGGREGATORS. Requêtes conference/certification ajoutées. 40 tests verts.
