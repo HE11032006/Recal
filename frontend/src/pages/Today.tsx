@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { api, type Opportunity } from "../api/client";
 import { OpportunityCard, SegmentedBar, TypeBadge } from "../components/OpportunityCard";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export default function Today() {
+  const { t } = useLanguage();
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [selected, setSelected] = useState<Opportunity | null>(null);
   const [filter, setFilter] = useState("all");
@@ -13,7 +15,7 @@ export default function Today() {
     api
       .listOpportunities({ page: 1, page_size: 50 })
       .then((page) => setOpportunities(page.items))
-      .catch((e) => setError(e instanceof Error ? e.message : "Erreur API"))
+      .catch((e) => setError(e instanceof Error ? e.message : "API error"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -23,21 +25,31 @@ export default function Today() {
   }, [opportunities, filter]);
 
   async function act(id: string, action: "saved" | "dismissed") {
-    await api.submitFeedback(id, action).catch(() => null);
+    const previous = opportunities;
     setOpportunities((list) =>
       list.map((o) => (o.id === id ? { ...o, status: action } : o))
     );
     setSelected((current) => (current && current.id === id ? { ...current, status: action } : current));
+    try {
+      await api.submitFeedback(id, action);
+    } catch {
+      setOpportunities(previous);
+      setSelected((current) =>
+        current && current.id === id
+          ? (previous.find((o) => o.id === id) ?? current)
+          : current
+      );
+    }
   }
 
   const tabs = [
-    { id: "all", label: `Tous (${opportunities.length})` },
-    { id: "hackathon", label: "Hackathons" },
-    { id: "internship", label: "Stages" },
-    { id: "fellowship", label: "Fellowships" },
-    { id: "scholarship", label: "Bourses" },
-    { id: "conference", label: "Conférences" },
-    { id: "certification", label: "Certifs" },
+    { id: "all", label: t.today.tabAll(opportunities.length) },
+    { id: "hackathon", label: t.today.tabShort.hackathon },
+    { id: "internship", label: t.today.tabShort.internship },
+    { id: "fellowship", label: t.today.tabShort.fellowship },
+    { id: "scholarship", label: t.today.tabShort.scholarship },
+    { id: "conference", label: t.today.tabShort.conference },
+    { id: "certification", label: t.today.tabShort.certification },
   ];
 
   return (
@@ -46,11 +58,11 @@ export default function Today() {
         <div className="flex flex-col gap-space-xs">
           <div className="flex items-center gap-space-sm">
             <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
-              Flux de veille prioritaire
+              {t.today.kicker}
             </span>
             <span className="text-outline-variant">/</span>
             <span className="font-mono text-label-sm text-primary">
-              {new Date().toLocaleDateString("fr-FR", {
+              {new Date().toLocaleDateString(t.locale, {
                 weekday: "long",
                 day: "numeric",
                 month: "long",
@@ -59,13 +71,13 @@ export default function Today() {
           </div>
           <div className="flex items-center gap-space-md">
             <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
-              Aujourd'hui
+              {t.today.title}
             </h1>
             {opportunities.length > 0 && (
               <div className="flex items-center gap-1.5 rounded border border-outline-variant/40 bg-surface-high px-2 py-0.5">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
                 <span className="font-mono text-label-sm font-medium text-on-surface">
-                  {opportunities.filter((o) => o.status === "new").length} nouvelles
+                  {t.today.newCount(opportunities.filter((o) => o.status === "new").length)}
                 </span>
               </div>
             )}
@@ -93,7 +105,7 @@ export default function Today() {
           {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-40 animate-pulse rounded border border-outline-variant/30 bg-surface-low"
+              className="skeleton-shimmer h-40 rounded border border-outline-variant/30"
             />
           ))}
         </div>
@@ -101,61 +113,62 @@ export default function Today() {
 
       {error && !loading && (
         <div className="rounded border border-error/40 bg-error-container/20 p-space-lg text-body-md text-error">
-          {error} — vérifie que le backend tourne (uvicorn port 8787).
+          {error} {t.today.errorBackend}
         </div>
       )}
 
       {!loading && !error && filtered.length === 0 && (
         <div className="flex flex-col items-center gap-space-md rounded border border-outline-variant/30 bg-surface-low py-space-xl text-center">
           <span className="material-symbols-outlined text-[32px] text-outline">radar</span>
-          <p className="text-body-lg text-on-surface-variant">
-            Rien de nouveau pour l'instant.
-          </p>
-          <p className="font-mono text-label-sm text-outline">
-            Ton agent continue d'analyser — prochain cycle planifié.
-          </p>
+          <p className="text-body-lg text-on-surface-variant">{t.today.emptyTitle}</p>
+          <p className="font-mono text-label-sm text-outline">{t.today.emptySub}</p>
         </div>
       )}
 
       {!error && filtered.length > 0 && (
         <>
           <div className="grid grid-cols-1 gap-space-md lg:grid-cols-2">
-            {filtered.map((opportunity) => (
-              <OpportunityCard
+            {filtered.map((opportunity, index) => (
+              <div
                 key={opportunity.id}
-                opportunity={opportunity}
-                selected={false}
-                onSelect={() => setSelected(opportunity)}
-              />
+                className="animate-rise"
+                style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
+              >
+                <OpportunityCard
+                  opportunity={opportunity}
+                  selected={false}
+                  onSelect={() => setSelected(opportunity)}
+                />
+              </div>
             ))}
           </div>
           <div className="flex items-center justify-between rounded border border-outline-variant/30 bg-surface-lowest p-space-md font-mono text-label-sm text-outline">
             <div className="flex items-center gap-space-sm">
               <span className="h-2 w-2 rounded-full bg-primary/50" />
               <span>
-                Cycle automatique actif —{" "}
-                <span className="font-medium text-on-surface">cloud</span>
+                {t.today.footerActive}{" "}
+                <span className="font-medium text-on-surface">{t.today.footerCloud}</span>
               </span>
             </div>
-            <span>{opportunities.length} SOURCES FILTRÉES</span>
+            <span>{opportunities.length} {t.today.footerSources}</span>
           </div>
         </>
       )}
 
       {selected && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-8"
+          className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-8 backdrop-blur-sm"
           onClick={() => setSelected(null)}
         >
           <div
-            className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded border border-outline-variant/50 bg-surface-low shadow-2xl"
+            className="animate-scale-in glass flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded border border-outline-variant/50 shadow-lift"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-outline-variant/30 bg-surface-lowest px-space-lg py-space-md">
               <div className="flex items-center gap-space-sm">
                 <span className="h-2 w-2 rounded-full bg-success" />
                 <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                  Analyse de l'agent
+                  {t.today.inspectorTitle}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -164,7 +177,7 @@ export default function Today() {
                   className="flex items-center gap-1 rounded border border-outline-variant/40 bg-surface-container px-2 py-1 font-mono text-label-sm text-on-surface transition-colors hover:bg-surface-high"
                 >
                   <span className="material-symbols-outlined text-[15px]">bookmark</span>
-                  Sauver
+                  {t.today.save}
                 </button>
                 <button
                   onClick={() => setSelected(null)}
@@ -186,7 +199,7 @@ export default function Today() {
                 </h3>
                 {selected.organization && (
                   <p className="text-body-md text-outline">
-                    Organisé par{" "}
+                    {t.today.organizedBy}{" "}
                     <strong className="font-medium text-on-surface">
                       {selected.organization}
                     </strong>
@@ -196,22 +209,22 @@ export default function Today() {
 
               <div className="grid grid-cols-3 gap-space-xs rounded border border-outline-variant/30 bg-surface-lowest p-space-sm">
                 <div className="flex flex-col rounded bg-surface-low p-2">
-                  <span className="font-mono text-label-sm uppercase text-outline">Type</span>
+                  <span className="font-mono text-label-sm uppercase text-outline">{t.today.fieldType}</span>
                   <span className="mt-0.5 font-medium text-on-surface">{selected.type}</span>
                 </div>
                 <div className="flex flex-col rounded bg-surface-low p-2">
-                  <span className="font-mono text-label-sm uppercase text-outline">Score</span>
+                  <span className="font-mono text-label-sm uppercase text-outline">{t.today.fieldScore}</span>
                   <span className="mt-0.5 font-medium text-on-surface">
                     {Math.round(selected.relevance_score)}%
                   </span>
                 </div>
                 <div className="flex flex-col rounded bg-surface-low p-2">
                   <span className="font-mono text-label-sm uppercase text-[#ff8f8f]">
-                    Deadline
+                    {t.today.fieldDeadline}
                   </span>
                   <span className="mt-0.5 font-semibold text-[#ff8f8f]">
                     {selected.deadline
-                      ? new Date(selected.deadline).toLocaleDateString("fr-FR")
+                      ? new Date(selected.deadline).toLocaleDateString(t.locale)
                       : "—"}
                   </span>
                 </div>
@@ -220,7 +233,7 @@ export default function Today() {
               <div className="flex flex-col gap-space-xs">
                 <h4 className="flex items-center gap-1.5 font-mono text-label-md uppercase tracking-wider text-on-surface">
                   <span className="h-1.5 w-1.5 bg-primary" />
-                  Résumé de l'opportunité
+                  {t.today.summaryTitle}
                 </h4>
                 <p className="text-justify leading-relaxed text-body-md text-on-surface-variant">
                   {selected.summary}
@@ -231,7 +244,7 @@ export default function Today() {
                 <div className="flex flex-col gap-space-sm">
                   <h4 className="flex items-center gap-1.5 font-mono text-label-md uppercase tracking-wider text-on-surface">
                     <span className="h-1.5 w-1.5 bg-primary" />
-                    Critères d'éligibilité
+                    {t.today.eligTitle}
                   </h4>
                   <div className="flex flex-col gap-2 rounded border border-outline-variant/30 bg-surface-lowest p-space-md">
                     {Object.entries(selected.eligibility).map(([key, value]) => (
@@ -259,18 +272,18 @@ export default function Today() {
                       psychology
                     </span>
                     <span className="font-mono text-label-md font-semibold uppercase text-on-surface">
-                      Analyse de pertinence
+                      {t.today.relevanceTitle}
                     </span>
                   </div>
                   <span className="font-mono text-label-sm text-success">
-                    CONFIANCE {Math.round(selected.confidence_score)}%
+                    {t.today.confidencePrefix} {Math.round(selected.confidence_score)}%
                   </span>
                 </div>
                 <div className="flex flex-col gap-space-md">
                   <div className="flex flex-col gap-1">
                     <div className="flex justify-between font-mono text-label-sm">
                       <span className="text-on-surface-variant">
-                        Score global de compatibilité
+                        {t.today.globalScore}
                       </span>
                       <span className="font-semibold text-on-surface">
                         {Math.round(selected.relevance_score)}%
@@ -280,7 +293,7 @@ export default function Today() {
                   </div>
                   <div className="flex flex-col gap-1">
                     <div className="flex justify-between font-mono text-label-sm">
-                      <span className="text-on-surface-variant">Confiance de l'analyse</span>
+                      <span className="text-on-surface-variant">{t.today.analysisConfidence}</span>
                       <span className="font-semibold text-on-surface">
                         {Math.round(selected.confidence_score)}%
                       </span>
@@ -291,7 +304,7 @@ export default function Today() {
                 {selected.relevance_reasons.length > 0 && (
                   <div className="rounded-r border-l-2 border-l-primary bg-surface-lowest/80 p-space-md">
                     <span className="mb-1 block font-mono text-label-sm uppercase text-primary">
-                      Avis d'adéquation :
+                      {t.today.fitTitle}
                     </span>
                     <ul className="flex list-disc flex-col gap-1 pl-4 text-body-sm leading-normal text-on-surface">
                       {selected.relevance_reasons.map((reason) => (
@@ -310,7 +323,7 @@ export default function Today() {
                 rel="noopener noreferrer"
                 className="flex flex-1 items-center justify-center gap-2 rounded bg-primary px-space-lg py-2 font-medium text-on-primary shadow-sm transition-colors hover:bg-primary-fixed"
               >
-                Ouvrir le site officiel
+                {t.today.openSite}
                 <span className="material-symbols-outlined text-[16px]">open_in_new</span>
               </a>
               <button
@@ -318,7 +331,7 @@ export default function Today() {
                 className="flex items-center gap-1.5 rounded border border-outline-variant/40 bg-surface-container px-space-md py-2 text-on-surface transition-colors hover:bg-surface-high"
               >
                 <span className="material-symbols-outlined text-[18px]">bookmark</span>
-                Sauvegarder
+                {t.today.saveBtn}
               </button>
               <button
                 onClick={() => {
@@ -327,7 +340,7 @@ export default function Today() {
                 }}
                 className="rounded border border-outline-variant/30 px-space-md py-2 text-outline transition-colors hover:border-error/40 hover:bg-error-container/20 hover:text-error"
               >
-                Passer
+                {t.today.skipBtn}
               </button>
             </div>
           </div>
