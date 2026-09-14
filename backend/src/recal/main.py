@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Any
 from uuid import uuid4
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, status
@@ -13,6 +13,7 @@ from fastapi.responses import JSONResponse
 from recal.application.use_cases import ResourceNotFoundError
 from recal.domain.entities import Feedback, UserProfile, WatchSettings
 from recal.domain.errors import WatchSkippedError
+from recal.infrastructure.config import get_settings
 from recal.infrastructure.dependencies import AppContainer, build_container
 from recal.infrastructure.observability import configure_logging, init_sentry
 from recal.infrastructure.rate_limit import InMemoryRateLimiter
@@ -39,12 +40,17 @@ app = FastAPI(
 
 configure_logging()
 init_sentry()
-_container = build_container()
+_settings = get_settings()
+_container = build_container(_settings)
 _run_rate_limiter = InMemoryRateLimiter(max_requests=5, window_seconds=60)
+
+API_KEY_HEADER = "x-api-key"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
+    allow_origins=["*"]
+    if _settings.cors_allow_all
+    else [
         "http://localhost",
         "http://127.0.0.1",
         "http://localhost:5173",
@@ -54,7 +60,7 @@ app.add_middleware(
     ],
     allow_credentials=False,
     allow_methods=["GET", "POST", "PUT"],
-    allow_headers=["Content-Type", "Authorization", "X-Request-ID"],
+    allow_headers=["Content-Type", "Authorization", "X-Request-ID", API_KEY_HEADER],
 )
 
 
@@ -68,6 +74,33 @@ async def request_context_middleware(request: Request, call_next):
     response.headers["Referrer-Policy"] = "no-referrer"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
     return response
+
+
+@app.middleware("http")
+async def api_key_middleware(request: Request, call_next):
+    """Clé API partagée, active uniquement si API_KEY est configurée.
+
+    Protège l'endpoint public (Function URL) contre les abus coûteux
+    (cycles Bedrock). Inactif en local tant que la variable est vide.
+    Laisse passer les pré-vols CORS et les endpoints non métier.
+    """
+    path = request.url.path
+    needs_key = (
+        bool(_settings.api_key)
+        and request.method != "OPTIONS"
+        and path.startswith("/api/v1")
+        and path != "/api/v1/health"
+    )
+    if needs_key and request.headers.get(API_KEY_HEADER) != _settings.api_key:
+        return JSONResponse(
+            status_code=401,
+            content={
+                "code": "unauthorized",
+                "message": "Clé API manquante ou invalide.",
+                "details": {},
+            },
+        )
+    return await call_next(request)
 
 
 @app.exception_handler(RequestValidationError)
@@ -269,3 +302,11 @@ async def get_run(
     if run is None:
         raise HTTPException(status_code=404, detail="Cycle introuvable")
     return _run_response(run)
+
+
+try:
+    from mangum import Mangum
+
+    handler: Any | None = Mangum(app, lifespan="off")
+except ImportError:  # pragma: no cover - présent uniquement dans le package Lambda
+    handler = None
