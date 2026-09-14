@@ -8,9 +8,8 @@
 ## Live Links
 
 - Donwload a file: 
-- GitHub repository: https://github.com/pjmorales1123/padayon
-- Usage guide: [docs/USAGE_GUIDE.md](docs/USAGE_GUIDE.md)
-- Demo readiness notes: [docs/demo-readiness-report.md](docs/demo-readiness-report.md)
+- GitHub repository: https://github.com/HE11032006/Recal
+- Video demo: 
 
 ## Description
 
