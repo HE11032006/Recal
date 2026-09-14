@@ -22,9 +22,9 @@ export function TypeBadge({ type }: { type: OpportunityType }) {
           : type === "scholarship"
             ? "text-warning"
             : type === "conference"
-              ? "text-[#8fd4ff]"
+              ? "text-primary-vivid"
               : type === "certification"
-                ? "text-[#d4a8ff]"
+                ? "text-tertiary"
                 : "text-outline";
   return (
     <span
@@ -36,10 +36,11 @@ export function TypeBadge({ type }: { type: OpportunityType }) {
 }
 
 export function DeadlineBadge({ deadline }: { deadline: string | null }) {
+  const { t } = useLanguage();
   if (!deadline) {
     return (
       <span className="px-2 py-0.5 font-mono text-label-sm text-outline border border-outline-variant/40 bg-surface-container">
-        —
+        {t.card.noDeadline}
       </span>
     );
   }
@@ -64,7 +65,7 @@ export function DeadlineBadge({ deadline }: { deadline: string | null }) {
   if (days <= 7) {
     return (
       <div className="flex flex-col items-end gap-1">
-        <span className="border border-[#832626] bg-[#3a1515] px-2 py-0.5 font-mono text-label-sm font-semibold text-[#ff8f8f]">
+        <span className="border border-error/30 bg-error-container px-2 py-0.5 font-mono text-label-sm font-semibold text-error">
           {label}
         </span>
         <span className="font-mono text-label-sm text-outline">{date}</span>
@@ -74,7 +75,7 @@ export function DeadlineBadge({ deadline }: { deadline: string | null }) {
   if (days <= 30) {
     return (
       <div className="flex flex-col items-end gap-1">
-        <span className="border border-[#6b4c19] bg-[#2d2210] px-2 py-0.5 font-mono text-label-sm font-semibold text-[#f7c06d]">
+        <span className="border border-warning/40 bg-warning/15 px-2 py-0.5 font-mono text-label-sm font-semibold text-warning">
           {label}
         </span>
         <span className="font-mono text-label-sm text-outline">{date}</span>
