@@ -1,0 +1,14 @@
+flowchart LR
+    U[Utilisateur] --> E[Application Electron<br/>React + Vite]
+    E -->|HTTPS REST + x-api-key| A[Lambda Function URL<br/>FastAPI + Mangum]
+    A --> D[(DynamoDB)]
+    A --> B[Amazon Bedrock<br/>Claude Haiku 4.5]
+
+    S[EventBridge Scheduler<br/>rate 1 hour] --> W[Lambda Worker<br/>recal-worker-dev]
+    W --> P[Parallel Search MCP]
+    W --> B
+    W --> D
+    W --> Q[SQS DLQ]
+
+    A -. lecture / écriture .-> D
+    W -. opportunités et états .-> D

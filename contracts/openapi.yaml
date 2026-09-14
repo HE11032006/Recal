@@ -4,16 +4,17 @@ info:
   version: 0.1.0
   description: API backend de l’agent autonome de veille d’opportunités.
 servers:
-  - url: http://localhost:8000
+  - url: http://127.0.0.1:8787
     description: Développement local
-  - url: https://api.example.com
-    description: Production — à remplacer
+  - url: https://REPLACE_WITH_API_FUNCTION_URL
+    description: Production (Lambda Function URL, header x-api-key requis)
 
 tags:
   - name: Health
   - name: Profile
   - name: Opportunities
   - name: Runs
+  - name: Watch
 
 paths:
   /api/v1/health:
@@ -29,11 +30,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
 
+  /api/v1/watch:
+    get:
+      tags: [Watch]
+      summary: État de veille de l'agent
+      description: Dernier cycle, prochain cycle, quota du jour et URLs analysées.
+      operationId: getWatchState
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: État de veille
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchState'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
   /api/v1/profile:
     get:
       tags: [Profile]
       summary: Lire le profil courant
       operationId: getProfile
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Profil utilisateur
@@ -41,10 +62,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
     put:
       tags: [Profile]
       summary: Remplacer le profil courant
       operationId: updateProfile
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -58,6 +83,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '422':
           $ref: '#/components/responses/ValidationError'
 
@@ -66,6 +93,8 @@ paths:
       tags: [Opportunities]
       summary: Lister les opportunités
       operationId: listOpportunities
+      security:
+        - ApiKeyAuth: []
       parameters:
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/PageSize'
@@ -80,6 +109,12 @@ paths:
             type: number
             minimum: 0
             maximum: 100
+        - name: since
+          in: query
+          description: ISO 8601 — opportunités vérifiées après cette date (polling nouveautés)
+          schema:
+            type: string
+            format: date-time
       responses:
         '200':
           description: Liste paginée
@@ -87,12 +122,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OpportunityPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
 
   /api/v1/opportunities/{opportunity_id}:
     get:
       tags: [Opportunities]
       summary: Lire une opportunité
       operationId: getOpportunity
+      security:
+        - ApiKeyAuth: []
       parameters:
         - $ref: '#/components/parameters/OpportunityId'
       responses:
@@ -102,6 +143,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Opportunity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -110,6 +153,8 @@ paths:
       tags: [Opportunities]
       summary: Enregistrer le feedback utilisateur
       operationId: submitOpportunityFeedback
+      security:
+        - ApiKeyAuth: []
       parameters:
         - $ref: '#/components/parameters/OpportunityId'
       requestBody:
@@ -125,6 +170,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FeedbackResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -134,6 +181,8 @@ paths:
       summary: Déclencher un cycle de veille
       description: Réservé au développement et à l’administration dans le MVP initial.
       operationId: createWatchRun
+      security:
+        - ApiKeyAuth: []
       responses:
         '202':
           description: Cycle accepté
@@ -141,12 +190,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Run'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
 
   /api/v1/runs/{run_id}:
     get:
       tags: [Runs]
       summary: Consulter le statut d’un cycle
       operationId: getWatchRun
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: run_id
           in: path
@@ -161,10 +218,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Run'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: >
+        Clé partagée exigée par l'API publique (Lambda Function URL).
+        Inactive en local tant que API_KEY est vide. 401 si absente ou invalide.
+
   parameters:
     OpportunityId:
       name: opportunity_id
@@ -191,6 +259,28 @@ components:
   responses:
     NotFound:
       description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Clé API manquante ou invalide (API publique uniquement)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Cycle ignoré par un garde-fou (fréquence, quota, cycle actif)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    RateLimited:
+      description: Trop de cycles demandés
+      headers:
+        Retry-After:
+          schema:
+            type: integer
       content:
         application/json:
           schema:
@@ -223,12 +313,23 @@ components:
       properties:
         id:
           type: string
+        full_name:
+          type: string
+          maxLength: 120
+        language:
+          type: string
+          enum: [fr, en]
+          default: fr
         interests:
           type: array
           items: {type: string}
         countries:
           type: array
           items: {type: string}
+        mobility_countries:
+          type: array
+          items: {type: string}
+          description: Pays acceptés pour les opportunités en présentiel
         study_level:
           type: string
         skills:
@@ -238,15 +339,27 @@ components:
           type: number
           minimum: 0
           maximum: 100
+        watch:
+          $ref: '#/components/schemas/WatchSettings'
 
     UserProfileUpdate:
       type: object
       required: [interests, countries, study_level, skills, relevance_threshold]
       properties:
+        full_name:
+          type: string
+          maxLength: 120
+        language:
+          type: string
+          enum: [fr, en]
+          default: fr
         interests:
           type: array
           items: {type: string}
         countries:
+          type: array
+          items: {type: string}
+        mobility_countries:
           type: array
           items: {type: string}
         study_level:
@@ -258,6 +371,76 @@ components:
           type: number
           minimum: 0
           maximum: 100
+        watch:
+          $ref: '#/components/schemas/WatchSettings'
+
+    WatchSettings:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          default: true
+        frequency_minutes:
+          type: integer
+          minimum: 15
+          maximum: 10080
+          default: 60
+        allowed_domains:
+          type: array
+          items: {type: string}
+          description: Vide = catalogue par défaut de l'agent
+        opportunity_types:
+          type: array
+          items:
+            type: string
+            enum: [hackathon, internship, fellowship, scholarship, conference, certification]
+        max_queries_per_run:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 3
+        max_results_per_query:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 5
+        minimum_relevance_score:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+          description: Surcharge le seuil du profil si défini
+        daily_max_runs:
+          type: integer
+          minimum: 1
+          maximum: 96
+          default: 12
+
+    WatchState:
+      type: object
+      properties:
+        last_run_at:
+          type: string
+          format: date-time
+          nullable: true
+        next_run_at:
+          type: string
+          format: date-time
+          nullable: true
+        last_successful_run_at:
+          type: string
+          format: date-time
+          nullable: true
+        runs_today:
+          type: integer
+        daily_max_runs:
+          type: integer
+        processed_urls_count:
+          type: integer
+        enabled:
+          type: boolean
+        frequency_minutes:
+          type: integer
 
     Opportunity:
       type: object
@@ -266,7 +449,7 @@ components:
         id: {type: string}
         type:
           type: string
-          enum: [hackathon, internship, fellowship, scholarship, other]
+          enum: [hackathon, internship, fellowship, scholarship, conference, certification, other]
         title: {type: string}
         organization: {type: string}
         summary: {type: string}
@@ -355,6 +538,12 @@ components:
         opportunities_found:
           type: integer
           minimum: 0
+        error_message:
+          type: string
+          nullable: true
+        urls_processed:
+          type: array
+          items: {type: string}
 
     ErrorResponse:
       type: object

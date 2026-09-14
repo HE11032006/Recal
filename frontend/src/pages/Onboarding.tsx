@@ -1,4 +1,4 @@
-﻿import { useState, type CSSProperties } from "react";
+﻿import { useEffect, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, BACKEND_OFFLINE, type Profile } from "../api/client";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -96,15 +96,22 @@ export default function Onboarding() {
         e instanceof Error && e.message === BACKEND_OFFLINE
           ? t.common.offlineTitle
           : (e instanceof Error ? e.message : t.onboarding.errUnknown)
-      );
+        );
       setLaunching(false);
     }
   }
 
+  // Vérifier si déjà onboarded au montage (pour éviter le re-onboarding au rechargement)
+  useEffect(() => {
+    if (localStorage.getItem("recal:onboarded") === "true") {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
+
   if (launching) {
     const steps = t.onboarding.launchSteps;
     return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-surface px-6 pt-9">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-surface px-6 pt-9">
         <div
           className="fixed left-0 right-0 top-0 flex h-9 items-center gap-2 border-b border-outline-variant/30 bg-surface pl-3 pr-32"
           style={{ WebkitAppRegion: "drag" } as CSSProperties}
@@ -139,7 +146,7 @@ export default function Onboarding() {
                   </span>
                 </span>
                 <span
-                  className={`text-body-md transition-colors ${
+                  className={`text-body-md ${
                     i <= launchStep ? "text-on-surface" : "text-outline"
                   }`}
                 >
@@ -150,7 +157,7 @@ export default function Onboarding() {
           </div>
           {error && (
             <div className="animate-fade-in border border-error/40 bg-error-container/30 rounded p-space-md text-body-sm text-error">
-              {error}
+              {error} — le cycle cloud planifié prend le relai.
             </div>
           )}
         </div>
@@ -182,271 +189,271 @@ export default function Onboarding() {
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center px-6 py-space-xl">
         <div key={step} className="animate-rise flex flex-col gap-space-lg">
           {step === 1 && (
-          <div className="flex flex-col gap-space-lg">
-            <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
-              {t.onboarding.stepOf(1)} · {t.onboarding.s1kicker}
-            </span>
-            <h1 className="text-3xl font-semibold tracking-tight text-on-surface">
-              {t.onboarding.s1title}
-            </h1>
-            <p className="text-body-lg leading-relaxed text-on-surface-variant">
-              {t.onboarding.s1desc}
-            </p>
-            <div className="flex flex-col gap-space-xs">
-              <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                {t.onboarding.language}
+            <div className="flex flex-col gap-space-lg">
+              <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
+                {t.onboarding.stepOf(1)} · {t.onboarding.s1kicker}
               </span>
-              <div className="grid grid-cols-2 gap-1 rounded border border-outline-variant/40 bg-surface-lowest p-1">
-                {(["fr", "en"] as const).map((lang) => (
-                  <button
-                    key={lang}
-                    type="button"
-                    onClick={() => pickLanguage(lang)}
-                    className={`flex items-center justify-center gap-2 rounded py-1.5 font-medium transition-all active:scale-95 ${
-                      language === lang
-                        ? "bg-surface-high text-on-surface"
+              <h1 className="text-3xl font-semibold tracking-tight text-on-surface">
+                {t.onboarding.s1title}
+              </h1>
+              <p className="text-body-lg leading-relaxed text-on-surface-variant">
+                {t.onboarding.s1desc}
+              </p>
+              <div className="flex flex-col gap-space-xs">
+                <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
+                  {t.onboarding.language}
+                </span>
+                <div className="grid grid-cols-2 gap-1 rounded border border-outline-variant/40 bg-surface-lowest p-1">
+                  {(["fr", "en"] as const).map((lang) => (
+                    <button
+                      key={lang}
+                      type="button"
+                      onClick={() => pickLanguage(lang)}
+                      className={`flex items-center justify-center gap-2 rounded py-1.5 px-3 font-medium transition-all ${
+                        language === lang
+                          ? "bg-surface-high text-on-surface shadow-sm"
                         : "text-on-surface-variant hover:text-on-surface"
-                    }`}
-                  >
-                    {language === lang && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
-                    {lang === "fr" ? "FR Français" : "EN English"}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex flex-col gap-space-xs">
-              <span className="flex items-center justify-between font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                {t.onboarding.identity}
-                <span className="text-primary">{t.onboarding.required}</span>
-              </span>
-              <input
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder={t.onboarding.namePlaceholder}
-                className="h-11 rounded border-none bg-surface-lowest px-3.5 text-on-surface placeholder:text-outline focus:bg-surface-low focus:outline-none"
-              />
-            </div>
-            <button
-              onClick={() => fullName.trim() && setStep(2)}
-              disabled={!fullName.trim()}
-              className="h-12 rounded bg-primary font-medium text-on-primary transition-all duration-150 hover:bg-primary-fixed hover:shadow-glow active:scale-[0.99] disabled:opacity-40"
-            >
-              {t.onboarding.start}
-            </button>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="flex flex-col gap-space-lg">
-            <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
-              {t.onboarding.stepOf(2)} · {t.onboarding.s2kicker}
-            </span>
-            <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
-              {t.onboarding.s2title}
-            </h1>
-            <div className="flex flex-col gap-space-xs">
-              <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                {t.onboarding.interests}
-              </span>
-              <div className="flex flex-wrap gap-1.5">
-                {t.onboarding.interestOptions.map((interest) => (
-                  <button
-                    key={interest}
-                    type="button"
-                    onClick={() => toggle(interests, interest, setInterests)}
-                    className={`rounded border px-2.5 py-1 font-mono text-label-sm transition-all active:scale-95 ${
-                      interests.includes(interest)
-                        ? "border-primary/60 bg-primary/15 text-primary"
-                        : "border-outline-variant/40 bg-surface-lowest text-on-surface-variant hover:text-on-surface"
-                    }`}
-                  >
-                    {interest}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex flex-col gap-space-xs">
-              <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                {t.onboarding.studyLevel}
-              </span>
-              <select
-                value={studyLevel}
-                onChange={(e) => setStudyLevel(e.target.value)}
-                className="h-11 rounded border-none bg-surface-lowest px-3 text-on-surface focus:outline-none"
-              >
-                <option value="">{t.onboarding.selectPlaceholder}</option>
-                {t.onboarding.studyOptions.map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-col gap-space-xs">
-              <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                {t.onboarding.country}
-              </span>
-              <input
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                placeholder={t.onboarding.countryPlaceholder}
-                className="h-11 rounded border-none bg-surface-lowest px-3.5 text-on-surface placeholder:text-outline focus:outline-none"
-              />
-            </div>
-            <div className="flex gap-space-sm">
-              <button
-                onClick={() => setStep(1)}
-                className="h-12 rounded border border-outline-variant/50 px-4 text-on-surface-variant transition-all hover:text-on-surface active:scale-95"
-              >
-                {t.onboarding.back}
-              </button>
-              <button
-                onClick={() => interests.length && setStep(3)}
-                disabled={!interests.length}
-                className="h-12 flex-1 rounded bg-primary font-medium text-on-primary transition-all duration-150 hover:bg-primary-fixed hover:shadow-glow active:scale-[0.99] disabled:opacity-40"
-              >
-                {t.onboarding.continue}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="flex flex-col gap-space-lg">
-            <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
-              {t.onboarding.stepOf(3)} · {t.onboarding.s3kicker}
-            </span>
-            <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
-              {t.onboarding.s3title}
-            </h1>
-            <div className="flex flex-col gap-space-xs">
-              <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                {t.onboarding.frequency}
-              </span>
-              <div className="grid grid-cols-3 gap-2">
-                {freqOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setFrequency(option.value)}
-                    className={`flex flex-col gap-1 rounded border p-space-md text-left transition-all active:scale-[0.98] ${
-                      frequency === option.value
-                        ? "border-primary/60 bg-primary/10"
-                        : "border-outline-variant/40 bg-surface-lowest hover:border-outline-variant/70"
-                    }`}
-                  >
-                    <span className="font-mono text-label-sm text-outline">{option.tag}</span>
-                    <span className="text-body-md font-medium text-on-surface">{option.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex flex-col gap-space-xs">
-              <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
-                {t.onboarding.watchTypes}
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                {TYPE_META.map((meta) => (
-                  <button
-                    key={meta.id}
-                    type="button"
-                    onClick={() => toggle(types, meta.id, setTypes)}
-                    className={`flex items-center justify-between rounded border p-space-md transition-all active:scale-[0.98] ${
-                      types.includes(meta.id)
-                        ? "border-primary/60 bg-primary/10"
-                        : "border-outline-variant/40 bg-surface-lowest"
-                    }`}
-                  >
-                    <span className="flex items-center gap-space-sm text-body-md text-on-surface">
-                      <span className="material-symbols-outlined text-[18px] text-outline">
-                        {meta.icon}
-                      </span>
-                      {t.types[meta.id as keyof typeof t.types]}
-                    </span>
-                    <span
-                      className={`h-4 w-4 rounded-sm border ${
-                        types.includes(meta.id)
-                          ? "border-primary bg-primary"
-                          : "border-outline-variant"
                       }`}
                     >
-                      {types.includes(meta.id) && (
-                        <span className="material-symbols-outlined text-[12px] text-on-primary">
-                          check
-                        </span>
-                      )}
-                    </span>
-                  </button>
-                ))}
+                      {language === lang && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                      {lang === "fr" ? "FR Français" : "EN English"}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="flex gap-space-sm">
+              <div className="flex flex-col gap-space-xs">
+                <span className="flex items-center justify-between font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
+                  {t.onboarding.identity}
+                  <span className="text-primary">REQUIS</span>
+                </span>
+                <input
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder={t.onboarding.namePlaceholder}
+                  className="h-11 rounded border-none bg-surface-lowest px-3.5 text-on-surface placeholder:text-outline focus:bg-surface-low focus:outline-none"
+                />
+              </div>
               <button
-                onClick={() => setStep(2)}
-                className="h-12 rounded border border-outline-variant/50 px-4 text-on-surface-variant transition-all hover:text-on-surface active:scale-95"
+                onClick={() => fullName.trim() && setStep(2)}
+                disabled={!fullName.trim()}
+                className="h-12 rounded bg-primary font-medium text-on-primary transition-all duration-150 hover:bg-primary-fixed hover:shadow-glow active:scale-[0.99] disabled:opacity-40"
               >
-                {t.onboarding.back}
-              </button>
-              <button
-                onClick={() => types.length && setStep(4)}
-                disabled={!types.length}
-                className="h-12 flex-1 rounded bg-primary font-medium text-on-primary transition-all duration-150 hover:bg-primary-fixed hover:shadow-glow active:scale-[0.99] disabled:opacity-40"
-              >
-                {t.onboarding.ready}
+                {t.onboarding.start}
               </button>
             </div>
-          </div>
-        )}
+          )}
 
-        {step === 4 && (
-          <div className="flex flex-col gap-space-lg">
-            <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
-              {t.onboarding.stepOf(4)} · {t.onboarding.s4kicker}
-            </span>
-            <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
-              {t.onboarding.s4title}
-            </h1>
-            <div className="flex flex-col gap-2 rounded border border-outline-variant/40 bg-surface-lowest p-space-md font-mono text-label-sm">
-              <div className="flex justify-between">
-                <span className="text-outline">{t.onboarding.recapAgent}</span>
-                <span className="text-on-surface">{fullName}</span>
+          {step === 2 && (
+            <div className="flex flex-col gap-space-lg">
+              <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
+                {t.onboarding.stepOf(2)} · {t.onboarding.s2kicker}
+              </span>
+              <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
+                {t.onboarding.s2title}
+              </h1>
+              <div className="flex flex-col gap-space-xs">
+                <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
+                  {t.onboarding.interests}
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {t.onboarding.interestOptions.map((interest) => (
+                    <button
+                      key={interest}
+                      type="button"
+                      onClick={() => toggle(interests, interest, setInterests)}
+                      className={`rounded border px-2.5 py-1 font-mono text-label-sm transition-colors active:scale-95 ${
+                        interests.includes(interest)
+                          ? "border-primary/60 bg-primary/15 text-primary"
+                          : "border-outline-variant/40 bg-surface-lowest text-on-surface-variant hover:text-on-surface"
+                      }`}
+                    >
+                      {interest}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-outline">{t.onboarding.recapInterests}</span>
-                <span className="text-on-surface">{interests.join(", ")}</span>
+              <div className="flex flex-col gap-space-xs">
+                <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
+                  {t.onboarding.studyLevel}
+                </span>
+                <select
+                  value={studyLevel}
+                  onChange={(e) => setStudyLevel(e.target.value)}
+                  className="h-11 rounded border-none bg-surface-lowest px-3 text-on-surface focus:outline-none"
+                >
+                  <option value="">{t.onboarding.selectPlaceholder}</option>
+                  {t.onboarding.studyOptions.map((level) => (
+                    <option key={level} value={level}>
+                      {level}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div className="flex justify-between">
-                <span className="text-outline">{t.onboarding.recapLevel}</span>
-                <span className="text-on-surface">{studyLevel || t.onboarding.recapEmpty}</span>
+              <div className="flex flex-col gap-space-xs">
+                <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
+                  {t.onboarding.country}
+                </span>
+                <input
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  placeholder={t.onboarding.countryPlaceholder}
+                  className="h-11 rounded border-none bg-surface-lowest px-3.5 text-on-surface placeholder:text-outline focus:outline-none"
+                />
               </div>
-              <div className="flex justify-between">
-                <span className="text-outline">{t.onboarding.recapFreq}</span>
-                <span className="text-on-surface">{frequency} {t.onboarding.minUnit}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-outline">{t.onboarding.recapTypes}</span>
-                <span className="text-on-surface">{types.join(", ")}</span>
+              <div className="flex gap-space-sm">
+                <button
+                  onClick={() => setStep(1)}
+                  className="h-12 rounded border border-outline-variant/50 px-4 text-on-surface-variant transition-colors hover:text-on-surface active:scale-95"
+                >
+                  {t.onboarding.back}
+                </button>
+                <button
+                  onClick={() => interests.length && setStep(3)}
+                  disabled={!interests.length}
+                  className="h-12 flex-1 rounded bg-primary font-medium text-on-primary transition-all duration-150 hover:bg-primary-fixed hover:shadow-glow active:scale-[0.99] disabled:opacity-40"
+                >
+                  {t.onboarding.continue}
+                </button>
               </div>
             </div>
-            <div className="flex gap-space-sm">
-              <button
-                onClick={() => setStep(3)}
-                className="h-12 rounded border border-outline-variant/50 px-4 text-on-surface-variant transition-all hover:text-on-surface active:scale-95"
-              >
-                {t.onboarding.back}
-              </button>
-              <button
-                onClick={launch}
-                className="h-12 flex-1 rounded bg-primary font-medium text-on-primary transition-all duration-150 hover:bg-primary-fixed hover:shadow-glow active:scale-[0.99]"
-              >
-                {t.onboarding.launch}
-              </button>
+          )}
+
+          {step === 3 && (
+            <div className="flex flex-col gap-space-lg">
+              <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
+                {t.onboarding.stepOf(3)} · {t.onboarding.s3kicker}
+              </span>
+              <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
+                {t.onboarding.s3title}
+              </h1>
+              <div className="flex flex-col gap-space-xs">
+                <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
+                  {t.onboarding.frequency}
+                </span>
+                <div className="grid grid-cols-3 gap-2">
+                  {freqOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setFrequency(option.value)}
+                      className={`flex flex-col gap-1 rounded border p-space-md text-left transition-colors ${
+                        frequency === option.value
+                          ? "border-primary/60 bg-primary/10"
+                          : "border-outline-variant/40 bg-surface-lowest hover:border-outline-variant/70"
+                      }`}
+                    >
+                      <span className="font-mono text-label-sm text-outline">{option.tag}</span>
+                      <span className="text-body-md font-medium text-on-surface">{option.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-col gap-space-xs">
+                <span className="font-mono text-label-sm uppercase tracking-wider text-on-surface-variant">
+                  {t.onboarding.watchTypes}
+                </span>
+                <div className="flex flex-col gap-2">
+                  {TYPE_META.map((meta) => (
+                    <button
+                      key={meta.id}
+                      type="button"
+                      onClick={() => toggle(types, meta.id, setTypes)}
+                      className={`flex items-center justify-between rounded border p-space-md transition-colors ${
+                        types.includes(meta.id)
+                          ? "border-primary/60 bg-primary/10"
+                          : "border-outline-variant/40 bg-surface-lowest"
+                      }`}
+                    >
+                      <span className="flex items-center gap-space-sm text-body-md text-on-surface">
+                        <span className="material-symbols-outlined text-[18px] text-outline">
+                          {meta.icon}
+                        </span>
+                        {t.types[meta.id as keyof typeof t.types]}
+                      </span>
+                      <span
+                        className={`h-4 w-4 rounded-sm border ${
+                          types.includes(meta.id)
+                            ? "border-primary bg-primary"
+                            : "border-outline-variant"
+                        }`}
+                      >
+                        {types.includes(meta.id) && (
+                          <span className="material-symbols-outlined text-[12px] text-on-primary">
+                            check
+                          </span>
+                        )}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-space-sm">
+                <button
+                  onClick={() => setStep(2)}
+                  className="h-12 rounded border border-outline-variant/50 px-4 text-on-surface-variant transition-colors hover:text-on-surface active:scale-95"
+                >
+                  {t.onboarding.back}
+                </button>
+                <button
+                  onClick={() => types.length && setStep(4)}
+                  disabled={!types.length}
+                  className="h-12 flex-1 rounded bg-primary font-medium text-on-primary transition-all duration-150 hover:bg-primary-fixed hover:shadow-glow active:scale-[0.99] disabled:opacity-40"
+                >
+                  {t.onboarding.ready}
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {step === 4 && (
+            <div className="flex flex-col gap-space-lg">
+              <span className="font-mono text-label-sm uppercase tracking-wider text-outline">
+                {t.onboarding.stepOf(4)} · {t.onboarding.s4kicker}
+              </span>
+              <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
+                {t.onboarding.s4title}
+              </h1>
+              <div className="flex flex-col gap-2 rounded border border-outline-variant/40 bg-surface-lowest p-space-md font-mono text-label-sm">
+                <div className="flex justify-between">
+                  <span className="text-outline">{t.onboarding.recapAgent}</span>
+                  <span className="text-on-surface">{fullName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-outline">{t.onboarding.recapInterests}</span>
+                  <span className="text-on-surface">{interests.join(", ")}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-outline">{t.onboarding.recapLevel}</span>
+                  <span className="text-on-surface">{studyLevel || t.onboarding.recapEmpty}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-outline">{t.onboarding.recapFreq}</span>
+                  <span className="text-on-surface">{frequency} {t.onboarding.minUnit}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-outline">{t.onboarding.recapTypes}</span>
+                  <span className="text-on-surface">{types.join(", ")}</span>
+                </div>
+              </div>
+              <div className="flex gap-space-sm">
+                <button
+                  onClick={() => setStep(3)}
+                  className="h-12 rounded border border-outline-variant/50 px-4 text-on-surface-variant transition-all hover:text-on-surface active:scale-95"
+                >
+                  {t.onboarding.back}
+                </button>
+                <button
+                  onClick={launch}
+                  className="h-12 flex-1 rounded bg-primary font-medium text-on-primary transition-all duration-150 hover:bg-primary-fixed hover:shadow-glow active:scale-[0.99]"
+                >
+                  {t.onboarding.launch}
+                </button>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     </div>
   );
 }
-

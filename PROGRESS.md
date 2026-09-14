@@ -134,3 +134,7 @@ Client API : `BACKEND_OFFLINE` levé sur échec réseau (TypeError), distingué 
 ### Mode hors-ligne + toggle clair/sombre
 
 Tokens Tailwind résolus via variables CSS (`:root` = Convex cream, `.dark` = palette sombre d'origine) : le thème commute instantanément sans recharger. Store `src/theme.ts` (persisté `recal:theme`, défaut = préférence OS), script anti-flash dans index.html, overlay natif Electron synchronisé via IPC `recal:setTheme`. Toggle Clair/Sombre dans Profil. Cache localStorage des 50 dernières opportunités : backend coupé = bannière "Mode hors-ligne · dernière synchro" + bouton Réessayer sur Today et Saved (au lieu du panneau d'erreur quand un cache existe). Badges et sliders passés en tokens adaptatifs aux deux thèmes.
+
+### Contrat OpenAPI synchronisé
+
+`contracts/openapi.yaml` aligné sur l'implémentation (vérifié par diff automatique : 8 chemins identiques, 19 refs résolues) : route `GET /api/v1/watch` + schéma `WatchState`, paramètre `?since=`, `securityScheme ApiKeyAuth` (x-api-key) sur toutes les routes sauf `/health`, réponses 401/409/429, types `conference`/`certification`, champs profil (`full_name`, `language`, `mobility_countries`, `watch`), schéma `WatchSettings` complet, champs `Run` manquants (`error_message`, `urls_processed`).
