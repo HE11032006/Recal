@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"surface-container-highest":"#333538","primary-container":"#7287ff","secondary-fixed":"#dce2f5","surface-container-low":"#1a1c1f","surface-container-high":"#282a2d","error":"#ffb4ab","on-tertiary-fixed-variant":"#773200","tertiary":"#ffb68f","outline":"#8e8fa1","surface-bright":"#37393d","inverse-surface":"#e2e2e6","background":"#111317","on-tertiary-fixed":"#331200","inverse-primary":"#2d4ce2","on-secondary-container":"#b1b8ca","on-primary":"#001f90","error-container":"#93000a","secondary":"#c0c6d8","secondary-container":"#424958","on-error":"#690005","on-primary-fixed":"#00105b","on-tertiary-container":"#491c00","on-background":"#e2e2e6","secondary-fixed-dim":"#c0c6d8","on-secondary":"#29313e","outline-variant":"#444655","on-secondary-fixed-variant":"#404755","surface-dim":"#111317","primary":"#bac3ff","on-error-container":"#ffdad6","inverse-on-surface":"#2f3034","tertiary-container":"#e66f1e","on-surface-variant":"#c5c5d8","surface":"#111317","surface-tint":"#bac3ff","tertiary-fixed":"#ffdbca","on-tertiary":"#542100","tertiary-fixed-dim":"#ffb68f","surface-variant":"#333538","on-primary-container":"#001a7f","on-surface":"#e2e2e6","on-primary-fixed-variant":"#002fc9","surface-container-lowest":"#0c0e11","surface-container":"#1e2023","primary-fixed-dim":"#bac3ff","on-secondary-fixed":"#151c29","primary-fixed":"#dee0ff"},borderRadius:{DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem"},spacing:{gutter:"1rem","space-xl":"1.5rem","space-lg":"1rem",margin:"1.5rem","space-sm":"0.5rem","space-xs":"0.25rem","space-md":"0.75rem"},fontFamily:{"headline-xl":["Inter"],"body-sm":["Inter"],"telemetry-metric":["JetBrains Mono"],"body-lg":["Inter"],"label-mono-md":["JetBrains Mono"],"label-mono-sm":["JetBrains Mono"],"headline-md":["Inter"],"headline-lg":["Inter"],"body-md":["Inter"]},fontSize:{"headline-xl":["2rem",{lineHeight:"2.5rem",letterSpacing:"-0.03em",fontWeight:"600"}],"body-sm":["0.75rem",{lineHeight:"1.125rem",fontWeight:"400"}],"telemetry-metric":["1.25rem",{lineHeight:"1.5rem",letterSpacing:"-0.02em",fontWeight:"600"}],"body-lg":["0.9375rem",{lineHeight:"1.5rem",letterSpacing:"-0.01em",fontWeight:"400"}],"label-mono-md":["0.75rem",{lineHeight:"1rem",letterSpacing:"0.02em",fontWeight:"500"}],"label-mono-sm":["0.6875rem",{lineHeight:"0.875rem",letterSpacing:"0.04em",fontWeight:"400"}],"headline-md":["1.125rem",{lineHeight:"1.5rem",letterSpacing:"-0.015em",fontWeight:"500"}],"headline-lg":["1.5rem",{lineHeight:"2rem",letterSpacing:"-0.025em",fontWeight:"600"}],"body-md":["0.8125rem",{lineHeight:"1.25rem",letterSpacing:"-0.005em",fontWeight:"400"}]}}}}</script></head><body class="bg-background font-body-md text-on-surface antialiased select-none"><header class="fixed top-0 left-0 right-0 h-14 bg-surface-container-low border-b border-outline-variant/30 z-50 flex items-center justify-between px-space-xl"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-md"><div class="w-7 h-7 border border-outline-variant/40 bg-surface-container-high rounded flex items-center justify-center font-label-mono-md text-label-mono-md text-primary font-semibold tracking-tighter">REC</div><div class="flex flex-col"><span class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight leading-none">RECAL</span><span class="font-label-mono-sm text-label-mono-sm text-outline tracking-wider uppercase leading-none mt-0.5">Agent de veille</span></div></div><div class="h-4 w-px bg-outline-variant/40"></div><div class="flex items-center gap-space-xs font-label-mono-sm text-label-mono-sm bg-surface-container px-space-md py-1 rounded border border-outline-variant/30"><span class="w-1.5 h-1.5 rounded-full bg-[#27c93f] animate-pulse"></span><span class="text-on-surface-variant font-medium">Agent synchrone</span><span class="text-outline-variant">·</span><span class="text-outline">sync il y a 8m</span></div><div class="flex items-center gap-space-xs font-label-mono-md text-label-mono-md text-outline"><span class="text-on-surface font-medium">PARIS</span><span class="text-outline-variant">/</span><span class="text-on-surface font-medium">14:32:09 CET</span></div></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-sm bg-surface-container-lowest border border-outline-variant/40 px-space-md py-1.5 rounded text-outline focus-within:border-primary transition-colors"><span class="material-symbols-outlined text-[16px]">search</span><input class="bg-transparent border-none outline-none font-body-sm text-body-sm text-on-surface placeholder-outline w-60" placeholder="Rechercher des opportunités..." type="text"/><kbd class="font-label-mono-sm text-label-mono-sm text-outline border border-outline-variant/40 px-1.5 py-0.5 rounded bg-surface-container">⌘K</kbd></div><button aria-label="Profil utilisateur" class="w-8 h-8 rounded border border-outline-variant/40 bg-surface-container-high hover:bg-surface-variant transition-colors flex items-center justify-center text-on-surface-variant hover:text-on-surface" type="button"><span class="material-symbols-outlined text-[18px]">person</span></button></div></header><aside class="fixed left-0 top-14 bottom-0 w-60 bg-surface-container-lowest border-r border-outline-variant/30 z-40 flex flex-col justify-between"><div class="p-space-lg flex flex-col gap-space-md"><div class="px-space-sm py-space-xs font-label-mono-sm text-label-mono-sm text-outline tracking-wider uppercase font-semibold">Console de flux</div><nav class="flex flex-col gap-space-xs" data-active-classes="bg-surface-container-high text-on-surface font-medium border-outline-variant/70"><a class="flex items-center justify-between px-space-md py-space-sm rounded font-body-md text-body-md text-on-surface-variant border border-transparent hover:bg-surface-container hover:text-on-surface transition-colors" data-path="aujourdhui" href="#"><span>Aujourd'hui</span><span class="font-label-mono-sm text-label-mono-sm bg-primary/20 text-primary border border-primary/30 px-1.5 py-0.5 rounded leading-none">3</span></a><a class="flex items-center justify-between px-space-md py-space-sm rounded font-body-md text-body-md text-on-surface-variant border border-transparent hover:bg-surface-container hover:text-on-surface transition-colors" data-path="sauvegardes" href="#"><span>Sauvegardés</span></a><a class="flex items-center justify-between px-space-md py-space-sm rounded font-body-md text-body-md text-on-surface-variant border border-transparent hover:bg-surface-container hover:text-on-surface transition-colors" data-path="profil-veille" href="#"><span>Profil &amp; Veille</span></a></nav></div><div class="p-space-lg border-t border-outline-variant/30 flex flex-col gap-space-md bg-surface-container-low/40"><div class="flex items-center justify-between font-label-mono-sm text-label-mono-sm"><span class="text-outline uppercase tracking-wider">Cycles d'exploration</span><span class="text-on-surface font-medium">4 / 12</span></div><div class="w-full bg-surface-container-high h-1 rounded overflow-hidden flex"><div class="bg-primary w-1/3 h-full"></div></div><div class="flex items-center justify-between font-label-mono-sm text-label-mono-sm pt-space-xs"><span class="text-outline">Prochaine collecte</span><span class="text-on-surface font-medium">15:00:00</span></div></div></aside><div class="pl-60"><main class="pt-14 min-h-screen bg-background w-full px-space-xl pb-space-xl"><div class="flex flex-col w-full">
+<!-- En-tête de page contextuel & Télémétrie brute -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-space-md pb-space-lg">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm font-label-mono-sm text-label-mono-sm text-outline">
+<span class="text-primary font-medium tracking-wider uppercase">Registre local</span>
+<span>/</span>
+<span>Candidatures &amp; Veille</span>
+<span>/</span>
+<span class="text-on-surface">Index #04</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">Opportunités Sauvegardées</h1>
+<p class="font-body-md text-body-md text-outline">Historique analytique et suivi rigoureux des dossiers archivés ou en cours de préparation.</p>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="bg-surface-container-low px-space-md py-1.5 rounded flex items-center gap-space-md">
+<div class="flex flex-col">
+<span class="font-label-mono-sm text-label-mono-sm text-outline uppercase tracking-wider">Quota actif</span>
+<span class="font-telemetry-metric text-telemetry-metric text-on-surface">08<span class="text-outline text-body-sm">/20</span></span>
+</div>
+<div class="w-12 h-6 flex items-end gap-0.5">
+<span class="w-1.5 h-2 bg-outline-variant"></span>
+<span class="w-1.5 h-3 bg-outline-variant"></span>
+<span class="w-1.5 h-5 bg-primary"></span>
+<span class="w-1.5 h-4 bg-primary"></span>
+<span class="w-1.5 h-6 bg-primary"></span>
+<span class="w-1.5 h-3 bg-outline-variant"></span>
+</div>
+</div>
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface font-label-mono-sm text-label-mono-sm px-space-md py-2 rounded flex items-center gap-space-xs transition-colors" title="Exporter au format ICS / iCal" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary">event_upcoming</span>
+<span>Sync Calendrier</span>
+</button>
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface font-label-mono-sm text-label-mono-sm px-space-md py-2 rounded flex items-center gap-space-xs transition-colors" title="Export CSV structuré" type="button">
+<span class="material-symbols-outlined text-[16px] text-outline">file_download</span>
+<span>CSV</span>
+</button>
+</div>
+</section>
+<!-- Barre de commande unifiée (Onglets + Recherche + Tri) -->
+<section class="bg-surface-container-lowest rounded p-space-xs flex flex-col lg:flex-row lg:items-center justify-between gap-space-md mb-space-lg">
+<!-- Onglets stricts -->
+<nav aria-label="Filtres de statut" class="flex items-center gap-1 overflow-x-auto">
+<button class="bg-surface-container-high text-on-surface px-space-md py-1.5 rounded flex items-center gap-space-sm transition-colors" type="button">
+<span class="font-body-md text-body-md font-medium">Tout</span>
+<span class="font-label-mono-sm text-label-mono-sm bg-surface-container-lowest text-outline px-1.5 py-0.5 rounded">14</span>
+</button>
+<button class="hover:bg-surface-container text-outline hover:text-on-surface px-space-md py-1.5 rounded flex items-center gap-space-sm transition-colors" type="button">
+<span class="font-body-md text-body-md">Nouveau</span>
+<span class="font-label-mono-sm text-label-mono-sm bg-surface-container-lowest text-primary px-1.5 py-0.5 rounded">3</span>
+</button>
+<button class="hover:bg-surface-container text-outline hover:text-on-surface px-space-md py-1.5 rounded flex items-center gap-space-sm transition-colors" type="button">
+<span class="font-body-md text-body-md font-medium">Sauvegardé</span>
+<span class="font-label-mono-sm text-label-mono-sm bg-surface-container-lowest text-outline px-1.5 py-0.5 rounded">8</span>
+</button>
+<button class="hover:bg-surface-container text-outline hover:text-on-surface px-space-md py-1.5 rounded flex items-center gap-space-sm transition-colors" type="button">
+<span class="font-body-md text-body-md">Passé / Archivé</span>
+<span class="font-label-mono-sm text-label-mono-sm bg-surface-container-lowest text-outline px-1.5 py-0.5 rounded">3</span>
+</button>
+</nav>
+<!-- Contrôles droits : Recherche & Tri rapide -->
+<div class="flex items-center gap-space-sm flex-wrap sm:flex-nowrap">
+<div class="relative flex-1 sm:w-64">
+<span class="material-symbols-outlined text-[16px] text-outline absolute left-2.5 top-2.5">filter_list</span>
+<input class="w-full bg-surface-container-low text-on-surface placeholder-outline font-body-sm text-body-sm pl-8 pr-3 py-1.5 rounded outline-none focus:bg-surface-container transition-colors" placeholder="Filtrer les opportunités..." type="text"/>
+</div>
+<div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1 rounded">
+<span class="font-label-mono-sm text-label-mono-sm text-outline">Trier :</span>
+<button class="font-label-mono-sm text-label-mono-sm text-primary px-space-xs py-0.5 rounded bg-surface-container font-medium" type="button">Pertinence</button>
+<span class="text-outline-variant font-label-mono-sm">/</span>
+<button class="font-label-mono-sm text-label-mono-sm text-outline hover:text-on-surface px-space-xs py-0.5 rounded" type="button">Deadline</button>
+</div>
+</div>
+</section>
+<!-- Layout Principal : Grille Split Panes Master-Detail -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start">
+<!-- Colonne Principale : Flux des fiches d'opportunités (8 cols) -->
+<main class="xl:col-span-8 flex flex-col gap-space-md">
+<!-- ITEM 1 : Jane Street Fellowship (J-12, Match 89%) -->
+<article class="bg-surface-container-low hover:bg-surface-container rounded p-space-lg flex flex-col gap-space-md transition-all shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-space-sm">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider text-primary font-semibold bg-primary/10 px-1.5 py-0.5 rounded">FELLOWSHIP DOCTORAL</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">· Sauvegardé hier, 18:42</span>
+<span class="font-label-mono-sm text-label-mono-sm text-tertiary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                Deadline critique
+              </span>
+</div>
+<h2 class="font-headline-md text-headline-md font-semibold text-on-surface tracking-tight">Jane Street Graduate Research Fellowship</h2>
+<div class="flex items-center gap-space-md text-outline font-body-sm text-body-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">location_on</span>Londres / Paris (Hybride)</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">payments</span>25 000 € / an</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">domain</span>Jane Street Capital Academic Programs</span>
+</div>
+</div>
+<!-- Match Score & Échéance -->
+<div class="flex sm:flex-col items-end justify-between sm:justify-start gap-space-xs shrink-0">
+<div class="flex items-center gap-space-xs bg-surface-container-lowest px-space-sm py-1 rounded">
+<span class="font-label-mono-sm text-label-mono-sm text-outline">ADÉQUATION</span>
+<span class="font-label-mono-md text-label-mono-md font-semibold text-[#4ade80]">89%</span>
+</div>
+<span class="font-label-mono-sm text-label-mono-sm text-tertiary font-medium">05 Nov 2024 · J-12</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+          Financement compétitif sans contrepartie de propriété intellectuelle pour candidats doctoraux travaillant sur les fondements mathématiques des systèmes distribués, algorithmes probabilistes ou théorie de l'optimisation.
+        </p>
+<!-- Tags Techniques Stricts -->
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-label-mono-sm text-label-mono-sm text-outline bg-surface-container px-2 py-0.5 rounded">Maths / Théorie</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline bg-surface-container px-2 py-0.5 rounded">Systèmes Distribués</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline bg-surface-container px-2 py-0.5 rounded">Recherche Doctorale</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline-variant bg-surface-container-lowest px-2 py-0.5 rounded">CV + Déclaration d'intention (2p max)</span>
+</div>
+<!-- Matrice de progression & Actions -->
+<div class="pt-space-sm flex flex-col sm:flex-row sm:items-center justify-between gap-space-md bg-surface-container-lowest/50 p-space-sm rounded">
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-label-mono-sm text-label-mono-sm text-on-surface">Dossier : Ébauche lettre (60%)</span>
+</div>
+<div class="hidden md:flex gap-0.5">
+<span class="w-4 h-1 bg-primary rounded-xs"></span>
+<span class="w-4 h-1 bg-primary rounded-xs"></span>
+<span class="w-4 h-1 bg-primary rounded-xs"></span>
+<span class="w-4 h-1 bg-surface-container-highest rounded-xs"></span>
+<span class="w-4 h-1 bg-surface-container-highest rounded-xs"></span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="text-outline hover:text-error hover:bg-error-container/20 font-label-mono-sm text-label-mono-sm px-space-sm py-1 rounded transition-colors" title="Détacher de la veille" type="button">
+              Retirer
+            </button>
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface font-label-mono-sm text-label-mono-sm px-space-md py-1 rounded transition-colors" type="button">
+              Voir le dossier
+            </button>
+<button class="bg-primary hover:bg-primary-container text-on-primary font-label-mono-sm text-label-mono-sm font-semibold px-space-md py-1 rounded transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[14px]">check</span>
+              Postulé
+            </button>
+</div>
+</div>
+</article>
+<!-- ITEM 2 : INRIA / Hugging Face (J-21, Match 74%) -->
+<article class="bg-surface-container-low hover:bg-surface-container rounded p-space-lg flex flex-col gap-space-md transition-all shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-space-sm">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider text-secondary font-semibold bg-surface-container px-1.5 py-0.5 rounded">STAGE R&amp;D</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">· Sauvegardé le 19 Oct</span>
+</div>
+<h2 class="font-headline-md text-headline-md font-semibold text-on-surface tracking-tight">Research Intern — Machine Learning Systems</h2>
+<div class="flex items-center gap-space-md text-outline font-body-sm text-body-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">location_on</span>Paris / Saclay (Laboratoire INRIA)</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">payments</span>Gratification labo + Bonus R&amp;D</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">group</span>INRIA Saclay &amp; Hugging Face Lab</span>
+</div>
+</div>
+<!-- Match Score & Échéance -->
+<div class="flex sm:flex-col items-end justify-between sm:justify-start gap-space-xs shrink-0">
+<div class="flex items-center gap-space-xs bg-surface-container-lowest px-space-sm py-1 rounded">
+<span class="font-label-mono-sm text-label-mono-sm text-outline">ADÉQUATION</span>
+<span class="font-label-mono-md text-label-mono-md font-semibold text-on-surface">74%</span>
+</div>
+<span class="font-label-mono-sm text-label-mono-sm text-on-surface-variant font-medium">14 Nov 2024 · J-21</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+          Travaux d'optimisation de l'inférence pour architectures Transformer ouvertes via compilation matérielle et quantification sparsifiée. Supervision conjointe académique et industrielle.
+        </p>
+<!-- Tags Techniques Stricts -->
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-label-mono-sm text-label-mono-sm text-outline bg-surface-container px-2 py-0.5 rounded">PyTorch</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline bg-surface-container px-2 py-0.5 rounded">Modèles de Langage</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline bg-surface-container px-2 py-0.5 rounded">Quantization / CUDA</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline-variant bg-surface-container-lowest px-2 py-0.5 rounded">6 Mois (Fév-Juil)</span>
+</div>
+<!-- Actions Directes -->
+<div class="pt-space-sm flex flex-col sm:flex-row sm:items-center justify-between gap-space-md bg-surface-container-lowest/50 p-space-sm rounded">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-mono-sm text-label-mono-sm text-outline">Statut : Non entamé · 1 recommandation requise</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="text-outline hover:text-error hover:bg-error-container/20 font-label-mono-sm text-label-mono-sm px-space-sm py-1 rounded transition-colors" type="button">
+              Retirer
+            </button>
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface font-label-mono-sm text-label-mono-sm px-space-md py-1 rounded transition-colors" type="button">
+              Voir le dossier
+            </button>
+<button class="bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-mono-sm text-label-mono-sm px-space-md py-1 rounded transition-colors" type="button">
+              Marquer comme postulé
+            </button>
+</div>
+</div>
+</article>
+<!-- ITEM 3 : Fondation Jean-Jacques Laffont Fellowship (J-37, Match 91%) -->
+<article class="bg-surface-container-low hover:bg-surface-container rounded p-space-lg flex flex-col gap-space-md transition-all shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-space-sm">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider text-primary font-semibold bg-primary/10 px-1.5 py-0.5 rounded">BOURSE D'EXCELLENCE</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">· Sauvegardé le 15 Oct</span>
+</div>
+<h2 class="font-headline-md text-headline-md font-semibold text-on-surface tracking-tight">Fondation Jean-Jacques Laffont Fellowship</h2>
+<div class="flex items-center gap-space-md text-outline font-body-sm text-body-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">location_on</span>Toulouse School of Economics</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">payments</span>Dotation 18 000 € net</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">school</span>Master 2 / Début Thèse</span>
+</div>
+</div>
+<!-- Match Score & Échéance -->
+<div class="flex sm:flex-col items-end justify-between sm:justify-start gap-space-xs shrink-0">
+<div class="flex items-center gap-space-xs bg-surface-container-lowest px-space-sm py-1 rounded">
+<span class="font-label-mono-sm text-label-mono-sm text-outline">ADÉQUATION</span>
+<span class="font-label-mono-md text-label-mono-md font-semibold text-[#4ade80]">91%</span>
+</div>
+<span class="font-label-mono-sm text-label-mono-sm text-on-surface-variant font-medium">30 Nov 2024 · J-37</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+          Programme de soutien aux recherches à l'intersection de l'économie computationnelle, des marchés de données et de l'intelligence artificielle pour les politiques publiques.
+        </p>
+<!-- Tags Techniques Stricts -->
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-label-mono-sm text-label-mono-sm text-outline bg-surface-container px-2 py-0.5 rounded">Économétrie</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline bg-surface-container px-2 py-0.5 rounded">IA Décisionnelle</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline bg-surface-container px-2 py-0.5 rounded">Théorie des Jeux</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline-variant bg-surface-container-lowest px-2 py-0.5 rounded">Dossier académique + Projet</span>
+</div>
+<!-- Actions Directes -->
+<div class="pt-space-sm flex flex-col sm:flex-row sm:items-center justify-between gap-space-md bg-surface-container-lowest/50 p-space-sm rounded">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-mono-sm text-label-mono-sm text-outline">Statut : En veille active · Contact enseignant pris</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="text-outline hover:text-error hover:bg-error-container/20 font-label-mono-sm text-label-mono-sm px-space-sm py-1 rounded transition-colors" type="button">
+              Retirer
+            </button>
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface font-label-mono-sm text-label-mono-sm px-space-md py-1 rounded transition-colors" type="button">
+              Voir le dossier
+            </button>
+<button class="bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-mono-sm text-label-mono-sm px-space-md py-1 rounded transition-colors" type="button">
+              Marquer comme postulé
+            </button>
+</div>
+</div>
+</article>
+<!-- ITEM 4 : ETHGlobal Cannes (Archivé) -->
+<article class="bg-surface-container-lowest/60 rounded p-space-lg flex flex-col gap-space-md opacity-60 hover:opacity-80 transition-opacity">
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-space-sm">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider text-outline bg-surface-container px-1.5 py-0.5 rounded">HACKATHON CONCOURS</span>
+<span class="font-label-mono-sm text-label-mono-sm text-error flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                Deadline passée · Archivé
+              </span>
+</div>
+<h2 class="font-headline-md text-headline-md font-semibold text-on-surface-variant line-through tracking-tight">ETHGlobal Cannes 2024</h2>
+<div class="flex items-center gap-space-md text-outline font-body-sm text-body-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">location_on</span>Cannes &amp; En ligne</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">payments</span>100 000 $ Prizes Pool</span>
+</div>
+</div>
+<div class="shrink-0 bg-surface-container px-space-sm py-1 rounded font-label-mono-sm text-label-mono-sm text-outline">
+            18 Oct 2024
+          </div>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-label-mono-sm text-label-mono-sm text-outline">Projet non soumis à temps · Document de rétroaction archivé</span>
+<button class="text-outline hover:text-on-surface font-label-mono-sm text-label-mono-sm px-space-sm py-1 rounded hover:bg-surface-container transition-colors" type="button">
+            Supprimer définitivement
+          </button>
+</div>
+</article>
+</main>
+<!-- Colonne Latérale Droite : Télémétrie, Alertes & Matrice (4 cols) -->
+<aside class="xl:col-span-4 flex flex-col gap-space-md">
+<!-- Carte de Métriques de Suivi Actif -->
+<section class="bg-surface-container-low rounded p-space-lg flex flex-col gap-space-md shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider text-outline font-semibold">Métriques de candidature</span>
+<span class="material-symbols-outlined text-[16px] text-outline">monitoring</span>
+</div>
+<div class="grid grid-cols-3 gap-space-xs pt-space-xs">
+<div class="bg-surface-container-lowest p-space-md rounded flex flex-col">
+<span class="font-label-mono-sm text-label-mono-sm text-outline uppercase">En réserve</span>
+<span class="font-telemetry-metric text-telemetry-metric font-semibold text-on-surface mt-1">08</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline-variant mt-0.5">Veille active</span>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded flex flex-col">
+<span class="font-label-mono-sm text-label-mono-sm text-outline uppercase">Soumises</span>
+<span class="font-telemetry-metric text-telemetry-metric font-semibold text-primary mt-1">02</span>
+<span class="font-label-mono-sm text-label-mono-sm text-primary/70 mt-0.5">En revue</span>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded flex flex-col">
+<span class="font-label-mono-sm text-label-mono-sm text-outline uppercase">Urgentes</span>
+<span class="font-telemetry-metric text-telemetry-metric font-semibold text-tertiary mt-1">01</span>
+<span class="font-label-mono-sm text-label-mono-sm text-tertiary/70 mt-0.5">&lt; 14 jours</span>
+</div>
+</div>
+<!-- Jauge d'avancement globale -->
+<div class="flex flex-col gap-space-xs pt-space-xs">
+<div class="flex justify-between font-label-mono-sm text-label-mono-sm">
+<span class="text-outline">Taux de conversion estimé</span>
+<span class="text-on-surface font-medium">25% (2/8)</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded overflow-hidden flex">
+<div class="bg-primary w-1/4 h-full"></div>
+<div class="bg-outline-variant/30 w-3/4 h-full"></div>
+</div>
+</div>
+</section>
+<!-- Alerte de Deadline Critique Dédiée -->
+<section class="bg-surface-container-low rounded p-space-lg flex flex-col gap-space-md shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs text-tertiary">
+<span class="material-symbols-outlined text-[16px]">alarm</span>
+<span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider font-semibold">Échéance prioritaire</span>
+</div>
+<span class="font-label-mono-sm text-label-mono-sm bg-tertiary/10 text-tertiary px-1.5 py-0.5 rounded font-medium">J-12</span>
+</div>
+<div class="flex flex-col gap-space-xs">
+<span class="font-headline-md text-headline-md font-semibold text-on-surface leading-snug">Jane Street Research Fellowship</span>
+<span class="font-body-sm text-body-sm text-outline">Clôture des candidatures le 05 Novembre à 23:59 GMT</span>
+</div>
+<!-- Checklist de conformité du dossier -->
+<div class="flex flex-col gap-space-xs bg-surface-container-lowest p-space-md rounded">
+<span class="font-label-mono-sm text-label-mono-sm text-outline uppercase tracking-wider mb-1">Pièces justificatives</span>
+<label class="flex items-center gap-space-sm text-on-surface font-body-sm text-body-sm cursor-pointer">
+<input checked="" class="accent-primary rounded-xs w-3.5 h-3.5" type="checkbox"/>
+<span class="line-through text-outline">Curriculum Vitae académique (v4.2)</span>
+</label>
+<label class="flex items-center gap-space-sm text-on-surface font-body-sm text-body-sm cursor-pointer">
+<input class="accent-primary rounded-xs w-3.5 h-3.5" type="checkbox"/>
+<span>Research Proposal (2 pages strictes)</span>
+</label>
+<label class="flex items-center gap-space-sm text-on-surface font-body-sm text-body-sm cursor-pointer">
+<input class="accent-primary rounded-xs w-3.5 h-3.5" type="checkbox"/>
+<span>Lettre de recommandation (Pr. Delahaye)</span>
+</label>
+</div>
+<a class="bg-surface-container hover:bg-surface-container-high text-on-surface text-center font-label-mono-sm text-label-mono-sm py-2 rounded transition-colors block" href="#">
+          Ouvrir le dossier d'application →
+        </a>
+</section>
+<!-- Matrice de Télémétrie d'Appariement du Profil -->
+<section class="bg-surface-container-low rounded p-space-lg flex flex-col gap-space-md shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider text-outline font-semibold">Pondération algorithmique</span>
+<span class="font-label-mono-sm text-label-mono-sm text-primary">Modèle v2.4</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline">
+          Facteurs déterminants calculés d'après votre profil chercheur (publications, historique de cours et compétences déclarées).
+        </p>
+<div class="flex flex-col gap-space-sm bg-surface-container-lowest p-space-md rounded">
+<!-- Ligne 1 -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-mono-sm text-label-mono-sm">
+<span class="text-on-surface-variant">Fondements théoriques</span>
+<span class="text-on-surface font-medium">9.2 / 10</span>
+</div>
+<div class="flex gap-1">
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-surface-container-highest rounded-xs"></span>
+</div>
+</div>
+<!-- Ligne 2 -->
+<div class="flex flex-col gap-1 pt-1">
+<div class="flex justify-between font-label-mono-sm text-label-mono-sm">
+<span class="text-on-surface-variant">Production code / Systèmes</span>
+<span class="text-on-surface font-medium">7.8 / 10</span>
+</div>
+<div class="flex gap-1">
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-surface-container-highest rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-surface-container-highest rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-surface-container-highest rounded-xs"></span>
+</div>
+</div>
+<!-- Ligne 3 -->
+<div class="flex flex-col gap-1 pt-1">
+<div class="flex justify-between font-label-mono-sm text-label-mono-sm">
+<span class="text-on-surface-variant">Alignement géographique</span>
+<span class="text-on-surface font-medium">10 / 10</span>
+</div>
+<div class="flex gap-1">
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+<span class="h-1.5 flex-1 bg-primary rounded-xs"></span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between text-outline font-label-mono-sm text-label-mono-sm pt-space-xs">
+<span>Dernière calibration : 14:15</span>
+<a class="text-primary hover:underline" href="#">Ajuster le profil</a>
+</div>
+</section>
+</aside>
+</div>
+</div></main></div></body></html>

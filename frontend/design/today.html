@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"surface-variant":"#333538","surface-container":"#1e2023","secondary-fixed":"#dce2f5","on-error":"#690005","surface":"#111317","on-tertiary-fixed-variant":"#773200","error":"#ffb4ab","surface-container-highest":"#333538","on-background":"#e2e2e6","tertiary-container":"#e66f1e","on-primary-fixed":"#00105b","error-container":"#93000a","outline-variant":"#444655","secondary-fixed-dim":"#c0c6d8","on-secondary-fixed-variant":"#404755","background":"#111317","tertiary-fixed":"#ffdbca","primary-container":"#7287ff","primary-fixed-dim":"#bac3ff","surface-container-lowest":"#0c0e11","outline":"#8e8fa1","inverse-surface":"#e2e2e6","on-primary-container":"#001a7f","on-secondary":"#29313e","surface-container-low":"#1a1c1f","surface-bright":"#37393d","secondary":"#c0c6d8","inverse-on-surface":"#2f3034","surface-container-high":"#282a2d","on-tertiary":"#542100","on-secondary-fixed":"#151c29","on-surface-variant":"#c5c5d8","tertiary":"#ffb68f","on-secondary-container":"#b1b8ca","inverse-primary":"#2d4ce2","on-tertiary-container":"#491c00","on-primary":"#001f90","on-error-container":"#ffdad6","on-surface":"#e2e2e6","secondary-container":"#424958","on-primary-fixed-variant":"#002fc9","on-tertiary-fixed":"#331200","surface-dim":"#111317","primary":"#bac3ff","surface-tint":"#bac3ff","primary-fixed":"#dee0ff","tertiary-fixed-dim":"#ffb68f"},borderRadius:{DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem"},spacing:{gutter:"1rem","space-xl":"1.5rem","space-sm":"0.5rem","space-md":"0.75rem",margin:"1.5rem","space-xs":"0.25rem","space-lg":"1rem"},fontFamily:{"headline-lg":["Inter"],"label-mono-md":["JetBrains Mono"],"telemetry-metric":["JetBrains Mono"],"body-lg":["Inter"],"body-md":["Inter"],"label-mono-sm":["JetBrains Mono"],"headline-md":["Inter"],"body-sm":["Inter"],"headline-xl":["Inter"]},fontSize:{"headline-lg":["1.5rem",{lineHeight:"2rem",letterSpacing:"-0.025em",fontWeight:"600"}],"label-mono-md":["0.75rem",{lineHeight:"1rem",letterSpacing:"0.02em",fontWeight:"500"}],"telemetry-metric":["1.25rem",{lineHeight:"1.5rem",letterSpacing:"-0.02em",fontWeight:"600"}],"body-lg":["0.9375rem",{lineHeight:"1.5rem",letterSpacing:"-0.01em",fontWeight:"400"}],"body-md":["0.8125rem",{lineHeight:"1.25rem",letterSpacing:"-0.005em",fontWeight:"400"}],"label-mono-sm":["0.6875rem",{lineHeight:"0.875rem",letterSpacing:"0.04em",fontWeight:"400"}],"headline-md":["1.125rem",{lineHeight:"1.5rem",letterSpacing:"-0.015em",fontWeight:"500"}],"body-sm":["0.75rem",{lineHeight:"1.125rem",fontWeight:"400"}],"headline-xl":["2rem",{lineHeight:"2.5rem",letterSpacing:"-0.03em",fontWeight:"600"}]}}}}</script></head><body class="bg-background font-body-md text-on-surface antialiased select-none"><div class="fixed top-0 left-0 right-0 h-10 bg-surface-container-lowest border-b border-outline-variant/30 z-50 flex items-center justify-between px-space-lg"><div class="flex items-center gap-space-md"><div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]/40"></div><div class="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]/40"></div><div class="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29]/40"></div></div><div class="h-3 w-px bg-outline-variant/40 ml-space-xs"></div><span class="font-label-mono-sm text-label-mono-sm text-outline tracking-wider uppercase">Recal — Agent de veille</span></div><div class="flex items-center gap-space-sm bg-surface-container-low px-space-md py-0.5 rounded border border-outline-variant/30"><span class="w-1.5 h-1.5 rounded-full bg-[#27c93f] animate-pulse"></span><span class="font-label-mono-sm text-label-mono-sm text-on-surface-variant">En veille</span><span class="text-outline-variant">·</span><span class="font-label-mono-sm text-label-mono-sm text-outline">Sync il y a 12m</span></div><div class="flex items-center gap-space-sm"><div class="flex items-center gap-1 px-space-sm py-0.5 bg-surface-container border border-outline-variant/40 rounded font-label-mono-sm text-label-mono-sm text-outline"><span class="text-on-surface-variant">⌘</span><span>K</span></div></div></div><aside class="fixed left-0 top-10 bottom-0 w-60 bg-surface-container-low border-r border-outline-variant/30 z-40 flex flex-col justify-between"><div class="p-space-lg flex flex-col gap-space-xl"><div class="flex items-center gap-space-md px-space-xs"><div class="w-6 h-6 border border-primary/40 bg-surface-container-high rounded flex items-center justify-center font-label-mono-md text-label-mono-md text-primary">[·]</div><span class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight">RECAL</span><span class="font-label-mono-sm text-label-mono-sm text-outline bg-surface-container px-1 py-0.5 rounded ml-auto">v1.4</span></div><nav class="flex flex-col gap-space-xs" data-active-classes="bg-surface-container-high text-on-surface font-medium border border-outline-variant/60"><a class="flex items-center justify-between px-space-md py-space-sm rounded font-body-md text-body-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="aujourdhui" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">radar</span><span>Aujourd'hui</span></div><span class="font-label-mono-sm text-label-mono-sm bg-primary/20 text-primary px-1.5 py-0.2 rounded">3</span></a><a class="flex items-center justify-between px-space-md py-space-sm rounded font-body-md text-body-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="sauvegardes" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">bookmark</span><span>Sauvegardés</span></div></a><a class="flex items-center justify-between px-space-md py-space-sm rounded font-body-md text-body-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="profil-veille" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">tune</span><span>Profil &amp; Veille</span></div></a></nav></div><div class="p-space-lg border-t border-outline-variant/30 flex flex-col gap-space-md bg-surface-container-lowest/50"><div class="flex items-center justify-between font-label-mono-sm text-label-mono-sm"><span class="text-outline uppercase">Cycles journaliers</span><span class="text-on-surface-variant">3 / 12</span></div><div class="w-full bg-surface-container-high h-1 rounded overflow-hidden flex"><div class="bg-primary w-1/4 h-full"></div></div><div class="flex items-center justify-between font-label-mono-sm text-label-mono-sm pt-space-xs"><span class="text-outline">Prochain cycle</span><span class="text-on-surface font-medium">14:00:00</span></div></div></aside><div class="pl-60"><header class="fixed top-10 left-60 right-0 h-14 bg-surface-container/70 backdrop-blur-md border-b border-outline-variant/30 z-30 flex items-center justify-between px-space-xl"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-xs font-label-mono-md text-label-mono-md text-outline"><span class="text-on-surface font-medium">24 OCT</span><span class="text-outline-variant">/</span><span>PARIS</span></div><div class="h-3 w-px bg-outline-variant/30"></div><div class="flex items-center gap-space-xs font-label-mono-sm text-label-mono-sm text-on-surface-variant"><span class="material-symbols-outlined text-[14px] text-outline">sensors</span><span>Flux RSS &amp; Labos synchronisés</span></div></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-sm bg-surface-container-low border border-outline-variant/40 px-space-md py-1 rounded text-outline focus-within:border-primary transition-colors"><span class="material-symbols-outlined text-[16px]">search</span><input class="bg-transparent border-none outline-none font-body-sm text-body-sm text-on-surface placeholder-outline w-44" placeholder="Filtrer les opportunités..." type="text"/><kbd class="font-label-mono-sm text-label-mono-sm text-outline border border-outline-variant/30 px-1 rounded bg-surface-container">/</kbd></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="relative pt-24 min-h-screen bg-background w-full px-space-xl pb-space-xl"><div class="flex flex-col w-full">
+<!-- Content Superstructure Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between pb-space-lg gap-space-md border-b border-outline-variant/30">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm">
+<span class="font-label-mono-sm text-label-mono-sm text-outline tracking-wider uppercase">Flux de veille prioritaire</span>
+<span class="text-outline-variant">/</span>
+<span class="font-label-mono-sm text-label-mono-sm text-primary font-medium">Mardi 24 Octobre 2024</span>
+</div>
+<div class="flex items-center gap-space-md mt-0.5">
+<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight">Aujourd'hui</h1>
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-high border border-outline-variant/40">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-mono-sm text-label-mono-sm text-on-surface font-medium">3 nouvelles opportunités</span>
+</div>
+</div>
+<div class="flex items-center gap-space-md text-outline font-label-mono-sm text-label-mono-sm pt-1">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">history</span>
+<span>Dernière analyse : 13:00:14</span>
+</div>
+<span>·</span>
+<span>45 sources indexées</span>
+<span>·</span>
+<span class="text-on-surface-variant">Taux d'éligibilité : 88.4%</span>
+</div>
+</div>
+<!-- Action Toolbar & Quick Segment Filters -->
+<div class="flex items-center gap-space-sm self-start md:self-end">
+<div class="flex items-center bg-surface-container-lowest p-0.5 rounded border border-outline-variant/40">
+<button class="px-space-md py-1 rounded font-label-mono-sm text-label-mono-sm bg-surface-container-high text-on-surface font-medium border border-outline-variant/40 transition-colors">Tous (3)</button>
+<button class="px-space-md py-1 rounded font-label-mono-sm text-label-mono-sm text-outline hover:text-on-surface transition-colors">Hackathons</button>
+<button class="px-space-md py-1 rounded font-label-mono-sm text-label-mono-sm text-outline hover:text-on-surface transition-colors">Fellowships</button>
+<button class="px-space-md py-1 rounded font-label-mono-sm text-label-mono-sm text-outline hover:text-on-surface transition-colors">Stages R&amp;D</button>
+</div>
+<button class="flex items-center gap-1.5 px-space-md py-1.5 bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm rounded border border-outline-variant/40 transition-colors" id="mark-all-read">
+<span class="material-symbols-outlined text-[16px] text-outline">done_all</span>
+<span>Tout marquer comme lu</span>
+</button>
+</div>
+</div>
+<!-- Primary Split-Pane Working Canvas -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg pt-space-lg items-start">
+<!-- Stream Master Pane: Opportunity Queue -->
+<div class="lg:col-span-7 flex flex-col gap-space-md">
+<!-- List Sorting & Triage Bar -->
+<div class="flex items-center justify-between px-space-xs font-label-mono-sm text-label-mono-sm text-outline">
+<div class="flex items-center gap-space-sm">
+<span>TRIÉ PAR :</span>
+<span class="text-on-surface font-medium underline underline-offset-4 decoration-primary/50">PERTINENCE ALGORITHMIQUE</span>
+</div>
+<span>INDICE CONFIANCE : 96.2%</span>
+</div>
+<!-- Opportunity Cards Stack -->
+<div class="flex flex-col gap-space-sm">
+<!-- CARD 1: Mistral AI (Active / Selected) -->
+<div class="relative flex flex-col p-space-lg bg-surface-container-high border-l-2 border-l-primary border-y border-r border-outline-variant/60 rounded-r cursor-pointer transition-all duration-150" id="card-mistral" onclick="selectOpportunity('mistral')">
+<div class="flex items-start justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs flex-1 min-w-0">
+<div class="flex items-center gap-space-sm">
+<span class="px-1.5 py-0.5 bg-surface-container-lowest border border-outline-variant/60 font-label-mono-sm text-label-mono-sm text-primary uppercase font-medium">HACKATHON</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">DÉTECTÉ IL Y A 2H</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight truncate mt-0.5">Mistral AI Worldwide Hackathon 2024</h2>
+<div class="flex items-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant">
+<span class="text-on-surface font-medium">Mistral AI</span>
+<span>·</span>
+<span>Paris &amp; Distanciel</span>
+<span>·</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">DOTATION 50 000€</span>
+</div>
+</div>
+<!-- Deadline Badge: J-3 Urgent (Architectural brick desaturated alert) -->
+<div class="flex flex-col items-end gap-1">
+<span class="px-2 py-0.5 bg-[#3a1515] border border-[#832626] font-label-mono-sm text-label-mono-sm text-[#ff8f8f] font-semibold">J-3</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">27 OCT</span>
+</div>
+</div>
+<!-- Matching Engine Telemetry Snippet -->
+<div class="mt-space-md pt-space-md border-t border-outline-variant/30 flex flex-col gap-space-xs">
+<div class="flex items-center justify-between font-label-mono-sm text-label-mono-sm">
+<div class="flex items-center gap-1 text-[#27c93f]">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+<span class="font-semibold uppercase">Match fort · 4 critères alignés</span>
+</div>
+<span class="text-outline">COMPATIBILITÉ 94%</span>
+</div>
+<div class="flex flex-wrap gap-1.5 mt-1">
+<span class="px-1.5 py-0.5 bg-surface-container-low border border-outline-variant/40 text-on-surface font-label-mono-sm text-label-mono-sm">IA &amp; LLM</span>
+<span class="px-1.5 py-0.5 bg-surface-container-low border border-outline-variant/40 text-on-surface font-label-mono-sm text-label-mono-sm">Licence 3 / Master</span>
+<span class="px-1.5 py-0.5 bg-surface-container-low border border-outline-variant/40 text-on-surface font-label-mono-sm text-label-mono-sm">Paris</span>
+<span class="px-1.5 py-0.5 bg-surface-container-low border border-outline-variant/40 text-on-surface font-label-mono-sm text-label-mono-sm">Projets Rapides</span>
+</div>
+</div>
+<!-- Card Operations Toolbar -->
+<div class="mt-space-md flex items-center justify-between pt-space-xs">
+<div class="flex items-center gap-space-xs">
+<button class="p-1.5 text-outline hover:text-on-surface hover:bg-surface-container rounded border border-transparent hover:border-outline-variant/40 transition-colors" title="Sauvegarder">
+<span class="material-symbols-outlined text-[18px]">bookmark</span>
+</button>
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded border border-transparent hover:border-error/40 transition-colors" title="Ignorer">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="flex items-center gap-1 font-label-mono-sm text-label-mono-sm text-primary font-medium">
+<span>VOIR LE DOSSIER COMPLET</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- CARD 2: Jane Street -->
+<div class="relative flex flex-col p-space-lg bg-surface-container-low border border-outline-variant/30 hover:border-outline-variant/70 hover:bg-surface-container rounded cursor-pointer transition-all duration-150" id="card-janestreet" onclick="selectOpportunity('janestreet')">
+<div class="flex items-start justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs flex-1 min-w-0">
+<div class="flex items-center gap-space-sm">
+<span class="px-1.5 py-0.5 bg-surface-container-lowest border border-outline-variant/40 font-label-mono-sm text-label-mono-sm text-secondary-fixed-dim uppercase font-medium">FELLOWSHIP</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">DÉTECTÉ HIER 23:40</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight truncate mt-0.5">Jane Street Graduate Research Fellowship</h2>
+<div class="flex items-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant">
+<span class="text-on-surface font-medium">Jane Street</span>
+<span>·</span>
+<span>Londres / Paris</span>
+<span>·</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">BOURSE 25 000€</span>
+</div>
+</div>
+<!-- Deadline Badge: J-12 Neutral Amber -->
+<div class="flex flex-col items-end gap-1">
+<span class="px-2 py-0.5 bg-[#2d2210] border border-[#6b4c19] font-label-mono-sm text-label-mono-sm text-[#f7c06d] font-semibold">J-12</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">05 NOV</span>
+</div>
+</div>
+<!-- Matching Engine Telemetry Snippet -->
+<div class="mt-space-md pt-space-md border-t border-outline-variant/20 flex flex-col gap-space-xs">
+<div class="flex items-center justify-between font-label-mono-sm text-label-mono-sm">
+<div class="flex items-center gap-1 text-[#27c93f]">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span class="font-semibold uppercase">Match fort · 3 critères alignés</span>
+</div>
+<span class="text-outline">COMPATIBILITÉ 89%</span>
+</div>
+<div class="flex flex-wrap gap-1.5 mt-1">
+<span class="px-1.5 py-0.5 bg-surface-container-lowest border border-outline-variant/30 text-on-surface-variant font-label-mono-sm text-label-mono-sm">Maths / Théorie</span>
+<span class="px-1.5 py-0.5 bg-surface-container-lowest border border-outline-variant/30 text-on-surface-variant font-label-mono-sm text-label-mono-sm">Master Recherche</span>
+<span class="px-1.5 py-0.5 bg-surface-container-lowest border border-outline-variant/30 text-on-surface-variant font-label-mono-sm text-label-mono-sm">Systèmes Distribués</span>
+</div>
+</div>
+<!-- Card Operations Toolbar -->
+<div class="mt-space-md flex items-center justify-between pt-space-xs">
+<div class="flex items-center gap-space-xs">
+<button class="p-1.5 text-outline hover:text-on-surface hover:bg-surface-container-high rounded border border-transparent hover:border-outline-variant/40 transition-colors" title="Sauvegarder">
+<span class="material-symbols-outlined text-[18px]">bookmark</span>
+</button>
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded border border-transparent hover:border-error/40 transition-colors" title="Ignorer">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="flex items-center gap-1 font-label-mono-sm text-label-mono-sm text-outline group-hover:text-on-surface">
+<span>Consulter</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- CARD 3: INRIA / Hugging Face -->
+<div class="relative flex flex-col p-space-lg bg-surface-container-low border border-outline-variant/30 hover:border-outline-variant/70 hover:bg-surface-container rounded cursor-pointer transition-all duration-150" id="card-inria" onclick="selectOpportunity('inria')">
+<div class="flex items-start justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs flex-1 min-w-0">
+<div class="flex items-center gap-space-sm">
+<span class="px-1.5 py-0.5 bg-surface-container-lowest border border-outline-variant/40 font-label-mono-sm text-label-mono-sm text-outline uppercase font-medium">STAGE DE FIN D'ÉTUDES</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">DÉTECTÉ IL Y A 6H</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight truncate mt-0.5">Research Intern — Machine Learning Systems</h2>
+<div class="flex items-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant">
+<span class="text-on-surface font-medium">INRIA / Hugging Face</span>
+<span>·</span>
+<span>Paris / Saclay</span>
+<span>·</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">6 MOIS · GRATIFICATION LABO</span>
+</div>
+</div>
+<!-- Deadline Badge: J-21 Cold neutral -->
+<div class="flex flex-col items-end gap-1">
+<span class="px-2 py-0.5 bg-surface-container border border-outline-variant/50 font-label-mono-sm text-label-mono-sm text-on-surface-variant font-semibold">J-21</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">14 NOV</span>
+</div>
+</div>
+<!-- Matching Engine Telemetry Snippet -->
+<div class="mt-space-md pt-space-md border-t border-outline-variant/20 flex flex-col gap-space-xs">
+<div class="flex items-center justify-between font-label-mono-sm text-label-mono-sm">
+<div class="flex items-center gap-1 text-outline">
+<span class="material-symbols-outlined text-[14px]">info</span>
+<span class="font-semibold uppercase">Match moyen · 2 critères alignés</span>
+</div>
+<span class="text-outline">COMPATIBILITÉ 74%</span>
+</div>
+<div class="flex flex-wrap gap-1.5 mt-1">
+<span class="px-1.5 py-0.5 bg-surface-container-lowest border border-outline-variant/30 text-on-surface-variant font-label-mono-sm text-label-mono-sm">PyTorch &amp; CUDA</span>
+<span class="px-1.5 py-0.5 bg-surface-container-lowest border border-outline-variant/30 text-on-surface-variant font-label-mono-sm text-label-mono-sm">Modèles de Langage</span>
+<span class="px-1.5 py-0.5 bg-surface-container-lowest border border-outline-variant/20 text-outline line-through font-label-mono-sm text-label-mono-sm">Publication Préalable</span>
+</div>
+</div>
+<!-- Card Operations Toolbar -->
+<div class="mt-space-md flex items-center justify-between pt-space-xs">
+<div class="flex items-center gap-space-xs">
+<button class="p-1.5 text-outline hover:text-on-surface hover:bg-surface-container-high rounded border border-transparent hover:border-outline-variant/40 transition-colors" title="Sauvegarder">
+<span class="material-symbols-outlined text-[18px]">bookmark</span>
+</button>
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded border border-transparent hover:border-error/40 transition-colors" title="Ignorer">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="flex items-center gap-1 font-label-mono-sm text-label-mono-sm text-outline">
+<span>Consulter</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Queue Telemetry Footer -->
+<div class="flex items-center justify-between p-space-md bg-surface-container-lowest border border-outline-variant/30 rounded font-label-mono-sm text-label-mono-sm text-outline mt-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="w-2 h-2 rounded-full bg-primary/50"></span>
+<span>Prochain cycle d'analyse automatique : <span class="text-on-surface font-medium">14:00:00</span></span>
+</div>
+<span>3 / 12 cycles exécutés</span>
+</div>
+</div>
+<!-- Inspector Detail Pane (~480px / 5 cols in grid) -->
+<div class="lg:col-span-5 flex flex-col bg-surface-container-low border border-outline-variant/40 rounded overflow-hidden shadow-2xl sticky top-28" id="inspector-pane">
+<!-- Inspector Header / Control Bar -->
+<div class="flex items-center justify-between px-space-lg py-space-md border-b border-outline-variant/30 bg-surface-container-lowest">
+<div class="flex items-center gap-space-sm">
+<span class="w-2 h-2 rounded-full bg-[#27c93f]"></span>
+<span class="font-label-mono-sm text-label-mono-sm text-on-surface-variant uppercase tracking-wider">Sélectionné pour toi il y a 2h</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-2 py-1 bg-surface-container hover:bg-surface-container-high border border-outline-variant/40 rounded text-on-surface font-label-mono-sm text-label-mono-sm flex items-center gap-1 transition-colors" title="Sauvegarder ce dossier">
+<span class="material-symbols-outlined text-[15px]">bookmark</span>
+<span>Sauvegarder</span>
+</button>
+<button class="p-1 text-outline hover:text-error hover:bg-surface-container rounded transition-colors ml-1" title="Ignorer et archiver">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+<!-- Inspector Scrollable Document Body -->
+<div class="p-space-xl flex flex-col gap-space-xl max-h-[calc(100vh-230px)] overflow-y-auto">
+<!-- Title & Sponsoring Entity -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-mono-sm text-label-mono-sm text-primary border border-outline-variant/40">HACKATHON MONDIAL</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">REF: MST-2024-EU</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">Mistral AI Worldwide Hackathon 2024</h3>
+<p class="font-body-md text-body-md text-outline">Organisé conjointement par <strong class="text-on-surface font-medium">Mistral AI</strong> et <strong class="text-on-surface font-medium">Bpifrance Hub Numérique</strong></p>
+</div>
+<!-- Telemetry Data Grid Strip -->
+<div class="grid grid-cols-3 gap-space-xs p-space-sm bg-surface-container-lowest border border-outline-variant/30 rounded">
+<div class="flex flex-col p-2 bg-surface-container-low rounded">
+<span class="font-label-mono-sm text-label-mono-sm text-outline uppercase">Format</span>
+<span class="font-body-md text-body-md text-on-surface font-medium mt-0.5">Paris &amp; Dist.</span>
+</div>
+<div class="flex flex-col p-2 bg-surface-container-low rounded">
+<span class="font-label-mono-sm text-label-mono-sm text-outline uppercase">Dotation</span>
+<span class="font-body-md text-body-md text-on-surface font-medium mt-0.5">50 000 €</span>
+</div>
+<div class="flex flex-col p-2 bg-surface-container-low rounded">
+<span class="font-label-mono-sm text-label-mono-sm text-[#ff8f8f] uppercase">Deadline</span>
+<span class="font-body-md text-body-md text-[#ff8f8f] font-semibold mt-0.5">27 Oct (J-3)</span>
+</div>
+</div>
+<!-- Section 1: Summary -->
+<div class="flex flex-col gap-space-xs">
+<h4 class="font-label-mono-md text-label-mono-md text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-primary rounded-none"></span>
+<span>Résumé de l'opportunité</span>
+</h4>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed text-justify">
+            Événement compétitif international d'ingénierie appliquée invitant 150 développeurs et chercheurs sur site à Paris (Station F) ainsi qu'en distanciel synchrone. L'objectif consiste à architecturer, entraîner ou affiner des solutions agents novatrices basées sur les modèles ouverts de pointe <span class="font-label-mono-sm text-label-mono-sm text-on-surface bg-surface-container-lowest px-1 py-0.5 rounded">Mistral-Large-2</span> et <span class="font-label-mono-sm text-label-mono-sm text-on-surface bg-surface-container-lowest px-1 py-0.5 rounded">Codestral</span>. Accompagnement direct par l'équipe d'ingénierie de Mistral AI et accès aux clusters GPU H100 sponsorisés.
+          </p>
+</div>
+<!-- Section 2: Eligibility Criteria Checklist -->
+<div class="flex flex-col gap-space-sm">
+<h4 class="font-label-mono-md text-label-mono-md text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-primary rounded-none"></span>
+<span>Critères d'éligibilité &amp; Conditions</span>
+</h4>
+<div class="flex flex-col gap-2 bg-surface-container-lowest p-space-md rounded border border-outline-variant/30">
+<div class="flex items-start gap-space-sm font-body-sm text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-[#27c93f] mt-0.5">check_box</span>
+<div class="flex-1">
+<span class="font-medium">Statut Académique :</span> Étudiants inscrits en cycle universitaire (L3, Master) ou en école d'ingénieurs au sein de l'UE.
+              </div>
+</div>
+<div class="flex items-start gap-space-sm font-body-sm text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-[#27c93f] mt-0.5">check_box</span>
+<div class="flex-1">
+<span class="font-medium">Structure des équipes :</span> Formation de groupes de 2 à 4 personnes (mise en relation Discord autorisée).
+              </div>
+</div>
+<div class="flex items-start gap-space-sm font-body-sm text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-[#27c93f] mt-0.5">check_box</span>
+<div class="flex-1">
+<span class="font-medium">Livrable technique :</span> Dépôt GitHub public avec code reproductible et API Mistral active lors du pitch final.
+              </div>
+</div>
+</div>
+</div>
+<!-- Section 3: Agent Intelligence Breakdown (Claude Synthesis) -->
+<div class="flex flex-col gap-space-md p-space-lg bg-surface-container border border-outline-variant/40 rounded">
+<div class="flex items-center justify-between border-b border-outline-variant/30 pb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px] text-primary">psychology</span>
+<span class="font-label-mono-md text-label-mono-md text-on-surface uppercase font-semibold">Analyse de pertinence · Claude Engine</span>
+</div>
+<span class="font-label-mono-sm text-label-mono-sm text-[#27c93f] font-mono">CONFIANCE ÉLEVÉE</span>
+</div>
+<!-- Discrete Progress Matrix -->
+<div class="flex flex-col gap-space-md">
+<!-- Metric 1 -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-mono-sm text-label-mono-sm">
+<span class="text-on-surface-variant">Correspondance avec ton profil académique</span>
+<span class="text-on-surface font-semibold">94%</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-none flex gap-0.5">
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-surface-container-high flex-1"></div>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-mono-sm text-label-mono-sm">
+<span class="text-on-surface-variant">Fraîcheur de l'opportunité (Détection)</span>
+<span class="text-on-surface font-semibold">98% <span class="text-outline font-normal">· il y a 4h</span></span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-none flex gap-0.5">
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+</div>
+</div>
+<!-- Metric 3 -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-mono-sm text-label-mono-sm">
+<span class="text-on-surface-variant">Fiabilité et intégrité de la source</span>
+<span class="text-on-surface font-semibold">95% <span class="text-outline font-normal">· Source vérifiée</span></span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-none flex gap-0.5">
+<div class="h-full bg-[#27c93f] flex-1"></div>
+<div class="h-full bg-[#27c93f] flex-1"></div>
+<div class="h-full bg-[#27c93f] flex-1"></div>
+<div class="h-full bg-[#27c93f] flex-1"></div>
+<div class="h-full bg-[#27c93f] flex-1"></div>
+<div class="h-full bg-[#27c93f] flex-1"></div>
+<div class="h-full bg-[#27c93f] flex-1"></div>
+<div class="h-full bg-[#27c93f] flex-1"></div>
+<div class="h-full bg-[#27c93f] flex-1"></div>
+<div class="h-full bg-surface-container-high flex-1"></div>
+</div>
+</div>
+</div>
+<!-- Verbal Analytical Synthesis -->
+<div class="mt-space-xs p-space-md bg-surface-container-lowest/80 border-l-2 border-l-primary rounded-r">
+<span class="font-label-mono-sm text-label-mono-sm text-primary uppercase block mb-1">Avis d'adéquation :</span>
+<p class="font-body-sm text-body-sm text-on-surface leading-normal">
+              « Alignement parfait avec vos compétences déclarées en modèles de fondation, architectures RAG et votre cursus Master 1 informatique. La proximité géographique avec l'écosystème parisien constitue un levier déterminant pour la sélection finale. »
+            </p>
+</div>
+</div>
+</div>
+<!-- Inspector Fixed Action Footer -->
+<div class="p-space-lg bg-surface-container-lowest border-t border-outline-variant/30 flex items-center justify-between gap-space-sm mt-auto">
+<a class="flex-1 flex items-center justify-center gap-2 py-2 px-space-lg bg-primary hover:bg-[#a1adff] text-on-primary font-body-md text-body-md font-medium rounded transition-colors shadow-sm" href="https://mistral.ai" rel="noopener noreferrer" target="_blank">
+<span>Ouvrir le site officiel</span>
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
+<button class="px-space-md py-2 bg-surface-container hover:bg-surface-container-high border border-outline-variant/40 rounded text-on-surface font-body-md text-body-md transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">bookmark</span>
+<span>Sauvegarder</span>
+</button>
+<button class="px-space-md py-2 bg-transparent hover:bg-error-container/20 border border-outline-variant/30 hover:border-error/40 rounded text-outline hover:text-error font-body-md text-body-md transition-colors">
+<span>Passer</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Native OS Desktop Notification Toast (Floating bottom-right or top-right) -->
+<aside aria-label="Notification système" class="fixed bottom-6 right-6 w-96 bg-[#161920] border border-[#2a3040] shadow-2xl rounded p- space-md flex flex-col gap-space-xs z-50 animate-bounce-short" id="native-toast">
+<div class="flex items-center justify-between border-b border-outline-variant/20 pb-space-xs px-space-xs">
+<div class="flex items-center gap-space-xs">
+<div class="w-4 h-4 rounded bg-primary/20 border border-primary/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-[11px] text-primary">radar</span>
+</div>
+<span class="font-label-mono-sm text-label-mono-sm text-on-surface font-semibold tracking-wider uppercase">Recal Agent</span>
+<span class="text-outline">·</span>
+<span class="font-label-mono-sm text-label-mono-sm text-outline">À l'instant</span>
+</div>
+<button class="text-outline hover:text-on-surface text-sm" onclick="dismissToast()">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</div>
+<div class="px-space-xs pt-1 flex flex-col gap-0.5">
+<h5 class="font-headline-md text-headline-md text-on-surface font-medium text-sm">3 nouvelles opportunités identifiées</h5>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Cycle de veille de 13:00 terminé avec succès. 45 sources examinées sans erreur de synchronisation.</p>
+</div>
+<div class="flex items-center justify-end gap-2 pt-space-xs px-space-xs">
+<button class="font-label-mono-sm text-label-mono-sm px-2 py-1 bg-[#1e232e] hover:bg-[#282f3d] text-on-surface rounded border border-outline-variant/40 transition-colors" onclick="dismissToast()">
+        Consulter le flux
+      </button>
+</div>
+</aside>
+</div>
+<script>
+  function dismissToast() {
+    const toast = document.getElementById('native-toast');
+    if (toast) {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(8px)';
+      toast.style.transition = 'all 150ms ease';
+      setTimeout(() => toast.remove(), 160);
+    }
+  }
+
+  function selectOpportunity(id) {
+    const cards = {
+      mistral: document.getElementById('card-mistral'),
+      janestreet: document.getElementById('card-janestreet'),
+      inria: document.getElementById('card-inria')
+    };
+
+    Object.values(cards).forEach(card => {
+      if (!card) return;
+      card.classList.remove('bg-surface-container-high', 'border-l-2', 'border-l-primary', 'border-y', 'border-r', 'border-outline-variant/60');
+      card.classList.add('bg-surface-container-low', 'border', 'border-outline-variant/30');
+    });
+
+    const active = cards[id];
+    if (active) {
+      active.classList.remove('bg-surface-container-low', 'border', 'border-outline-variant/30');
+      active.classList.add('bg-surface-container-high', 'border-l-2', 'border-l-primary', 'border-y', 'border-r', 'border-outline-variant/60');
+    }
+  }
+
+  document.getElementById('mark-all-read')?.addEventListener('click', function() {
+    this.innerHTML = '<span class="material-symbols-outlined text-[16px] text-[#27c93f]">done</span><span>Tout est lu</span>';
+    this.classList.add('opacity-75');
+  });
+</script></main></div></body></html>
