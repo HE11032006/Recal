@@ -1,4 +1,4 @@
-export type Lang = "fr" | "en";
+﻿export type Lang = "fr" | "en";
 
 const fr = {
   locale: "fr-FR",
@@ -71,6 +71,7 @@ const fr = {
     s4kicker: "Récapitulatif",
     s4title: "Configuration vérifiée.",
     recapAgent: "AGENT",
+    recapEmpty: "Non renseigné",
     recapInterests: "INTÉRÊTS",
     recapLevel: "NIVEAU",
     recapFreq: "FRÉQUENCE",
@@ -86,9 +87,9 @@ const fr = {
       "Calcul des scores de pertinence…",
       "Premier flux compilé !",
     ],
-    errSkipped: (msg: string) => `${msg} — le cycle cloud planifié prend le relai.`,
+    errSkipped: (msg: string) => `${msg} · le cycle cloud planifié prend le relai.`,
     errBackground:
-      "L'analyse continue en arrière-plan (cloud) — l'agent a déjà été configuré.",
+      "L'analyse continue en arrière-plan (cloud) · l'agent a déjà été configuré.",
     errUnknown: "Erreur inconnue",
   },
   today: {
@@ -108,10 +109,9 @@ const fr = {
       conference: "Conférences",
       certification: "Certifs",
     },
-    errorBackend: "— vérifie que le backend tourne (uvicorn port 8787).",
     emptyTitle: "Rien de nouveau pour l'instant.",
-    emptySub: "Ton agent continue d'analyser — prochain cycle planifié.",
-    footerActive: "Cycle automatique actif —",
+    emptySub: "Ton agent continue d'analyser · prochain cycle planifié.",
+    footerActive: "Cycle automatique actif ·",
     footerCloud: "cloud",
     footerSources: "SOURCES FILTRÉES",
     inspectorTitle: "Analyse de l'agent",
@@ -155,10 +155,13 @@ const fr = {
     saveErr: "Erreur de sauvegarde",
     runErr: "Erreur cycle",
     runMsg: (id: string, status: string, found: number) =>
-      `Cycle lancé (${id.slice(0, 8)}…) — statut : ${status}. ${
+      `Cycle lancé (${id.slice(0, 8)}…) · statut : ${status}. ${
         found > 0 ? `${found} opportunités trouvées.` : ""
       }`,
     langLabel: "Langue de l'interface",
+    themeLabel: "Thème de l'interface",
+    themeLight: "Clair",
+    themeDark: "Sombre",
     interests: "Centres d'intérêt",
     interestsPh: "IA, Web, Data…",
     skills: "Compétences & stack technique",
@@ -176,11 +179,12 @@ const fr = {
     agentState: "État de l'agent",
     lastRun: "DERNIER CYCLE",
     nextRun: "PROCHAIN CYCLE",
+    neverRun: "Jamais",
     runsToday: "CYCLES AUJOURD'HUI",
     urlsAnalyzed: "URLS ANALYSÉES",
     execution: "EXÉCUTION",
-    cloudLabel: "CLOUD — EventBridge",
-    stateOffline: "État indisponible — backend hors ligne ?",
+    cloudLabel: "CLOUD · EventBridge",
+    stateOffline: "État indisponible · backend hors ligne ?",
   },
   card: {
     matchStrong: "Match fort",
@@ -189,6 +193,15 @@ const fr = {
     compatPrefix: "COMPATIBILITÉ",
     openLink: "OUVRIR ↗",
     detail: "DÉTAIL",
+    noDeadline: "Sans échéance",
+  },
+  common: {
+    retry: "Réessayer",
+    offlineTitle: "Backend injoignable",
+    offlineBody: "L'API locale ne répond pas. Démarre le backend, puis réessaie.",
+    requestFailed: "La requête a échoué. Réessaie dans un instant.",
+    offlineBanner: "Mode hors-ligne",
+    lastSync: "Dernière synchro",
   },
 };
 
@@ -265,6 +278,7 @@ const en: Dictionary = {
     s4kicker: "Summary",
     s4title: "Configuration verified.",
     recapAgent: "AGENT",
+    recapEmpty: "Not provided",
     recapInterests: "INTERESTS",
     recapLevel: "LEVEL",
     recapFreq: "FREQUENCY",
@@ -280,9 +294,9 @@ const en: Dictionary = {
       "Computing relevance scores…",
       "First feed compiled!",
     ],
-    errSkipped: (msg: string) => `${msg} — the scheduled cloud cycle takes over.`,
+    errSkipped: (msg: string) => `${msg} · the scheduled cloud cycle takes over.`,
     errBackground:
-      "Analysis continues in the background (cloud) — the agent is already configured.",
+      "Analysis continues in the background (cloud) · the agent is already configured.",
     errUnknown: "Unknown error",
   },
   today: {
@@ -300,10 +314,9 @@ const en: Dictionary = {
       conference: "Conferences",
       certification: "Certs",
     },
-    errorBackend: "— check that the backend is running (uvicorn port 8787).",
     emptyTitle: "Nothing new for now.",
-    emptySub: "Your agent keeps analyzing — next cycle scheduled.",
-    footerActive: "Automatic cycle active —",
+    emptySub: "Your agent keeps analyzing · next cycle scheduled.",
+    footerActive: "Automatic cycle active ·",
     footerCloud: "cloud",
     footerSources: "FILTERED SOURCES",
     inspectorTitle: "Agent analysis",
@@ -347,10 +360,13 @@ const en: Dictionary = {
     saveErr: "Save error",
     runErr: "Cycle error",
     runMsg: (id: string, status: string, found: number) =>
-      `Cycle started (${id.slice(0, 8)}…) — status: ${status}. ${
+      `Cycle started (${id.slice(0, 8)}…) · status: ${status}. ${
         found > 0 ? `${found} opportunities found.` : ""
       }`,
     langLabel: "Interface language",
+    themeLabel: "Interface theme",
+    themeLight: "Light",
+    themeDark: "Dark",
     interests: "Interests",
     interestsPh: "AI, Web, Data…",
     skills: "Skills & tech stack",
@@ -368,11 +384,12 @@ const en: Dictionary = {
     agentState: "Agent state",
     lastRun: "LAST RUN",
     nextRun: "NEXT RUN",
+    neverRun: "Never",
     runsToday: "RUNS TODAY",
     urlsAnalyzed: "URLS ANALYZED",
     execution: "RUNTIME",
-    cloudLabel: "CLOUD — EventBridge",
-    stateOffline: "State unavailable — backend offline?",
+    cloudLabel: "CLOUD · EventBridge",
+    stateOffline: "State unavailable · backend offline?",
   },
   card: {
     matchStrong: "Strong match",
@@ -381,6 +398,15 @@ const en: Dictionary = {
     compatPrefix: "MATCH",
     openLink: "OPEN ↗",
     detail: "DETAILS",
+    noDeadline: "No deadline",
+  },
+  common: {
+    retry: "Retry",
+    offlineTitle: "Backend unreachable",
+    offlineBody: "The local API is not responding. Start the backend, then retry.",
+    requestFailed: "The request failed. Please retry in a moment.",
+    offlineBanner: "Offline mode",
+    lastSync: "Last sync",
   },
 };
 
