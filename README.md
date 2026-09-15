@@ -7,9 +7,9 @@
 
 ## Live Links
 
-- Donwload a file: 
+- Donwload a file: https://github.com/HE11032006/Recal/releases/download/V0.1.0/Recal.Setup.0.1.0.exe
 - GitHub repository: https://github.com/HE11032006/Recal
-- Video demo: 
+- Video demo: https://youtu.be/ffkz4I85D6g
 
 ## Description
 
