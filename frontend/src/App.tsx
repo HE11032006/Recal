@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
 import Onboarding from "./pages/Onboarding";
 import Today from "./pages/Today";
@@ -6,6 +6,7 @@ import Saved from "./pages/Saved";
 import Profile from "./pages/Profile";
 
 export default function App() {
+  const location = useLocation();
   const hasProfile = localStorage.getItem("recal:onboarded") === "true";
 
   return (
@@ -16,7 +17,7 @@ export default function App() {
       />
       <Route
         path="/"
-        element={hasProfile ? <AppShell /> : <Navigate to="/onboarding" replace />}
+        element={hasProfile || location.pathname === "/onboarding" ? <AppShell /> : <Navigate to="/onboarding" replace />}
       >
         <Route index element={<Today />} />
         <Route path="saved" element={<Saved />} />

@@ -49,8 +49,7 @@ export default function Onboarding() {
     localStorage.setItem("recal:onboarded", "true");
     setLaunching(true);
     setError(null);
-    try {
-      await api.updateProfile({
+    const profilePayload = {
         full_name: fullName,
         language,
         interests: interests.length ? interests : ["tech"],
@@ -66,25 +65,45 @@ export default function Onboarding() {
           minimum_relevance_score: null,
           daily_max_runs: 12,
         },
-      } as Partial<Profile>);
+      } as Partial<Profile>;
+    let profileSynced = true;
+    try {
+      await api.updateProfile(profilePayload);
+    } catch (e) {
+      if (e instanceof Error && e.message === BACKEND_OFFLINE) {
+        // L'onboarding reste utilisable sans réseau. Le profil sera
+        // resynchronisé lorsque l'API cloud sera de nouveau disponible.
+        localStorage.setItem("recal:pending-profile", JSON.stringify(profilePayload));
+        profileSynced = false;
+      } else {
+        setError(e instanceof Error ? e.message : t.onboarding.errUnknown);
+        setLaunching(false);
+        return;
+      }
+    }
+    try {
       setLaunchStep(1);
       await new Promise((r) => setTimeout(r, 800));
       setLaunchStep(2);
       // Cycle lancé avec timeout : ne bloque pas l'onboarding si l'analyse
       // prend plusieurs minutes (Parallel + Claude réels = 1-3 min).
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 60000);
-      try {
-        await api.createRun(controller.signal);
-      } catch (e) {
-        // 409 = cycle déjà en cours ou quota : le cloud prend le relai.
-        setError(
-          e instanceof Error && e.message.includes("Cycle ignoré")
-            ? t.onboarding.errSkipped(e.message)
-            : t.onboarding.errBackground
-        );
-      } finally {
-        clearTimeout(timeout);
+      if (profileSynced) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 60000);
+        try {
+          await api.createRun(controller.signal);
+        } catch (e) {
+          // 409 = cycle déjà en cours ou quota : le cloud prend le relai.
+          setError(
+            e instanceof Error && e.message.includes("Cycle ignoré")
+              ? t.onboarding.errSkipped(e.message)
+              : t.onboarding.errBackground
+          );
+        } finally {
+          clearTimeout(timeout);
+        }
+      } else {
+        setError(t.common.offlineTitle);
       }
       setLaunchStep(3);
       await new Promise((r) => setTimeout(r, 1200));
